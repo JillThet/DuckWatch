@@ -110,21 +110,21 @@
 /* Config register controls the rate, filter, and interface 
  * 	options of the device. NOTE: writes to register in normal 
  *	mode may be ignored. In sleep mode writes are not ignored.
- * TSB_F - Inactive duration in normal mode = 0.5
- * TSB_62F - Inactive duration in normal mode = 62.5
- * TSB_125 - Inactive duration in normal mode = 125
- * TSB_250 - Inactive duration in normal mode = 250
- * TSB_500 - Inactive duration in normal mode = 500
- * TSB_1000 - Inactive duration in normal mode = 1000
- * TSB_10 - Inactive duration in normal mode = 10
- * TSB_20 - Inactive duration in normal mode = 20
- * FLTR_OFF - Fliter off
- * FLTR_2 - Fliter coefficient = 2
- * FLTR_4 - Fliter coefficient = 4
- * FLTR_8 - Fliter coefficient = 8
- * FLTR_16 - Fliter coefficient = 16 
- * SPI_EN - Enables 3-wire SPI
- * SPI_DIS - Disables 3-wire SPI
+ * TSB_F	- Inactive duration in normal mode = 0.5
+ * TSB_62F	- Inactive duration in normal mode = 62.5
+ * TSB_125	- Inactive duration in normal mode = 125
+ * TSB_250	- Inactive duration in normal mode = 250
+ * TSB_500	- Inactive duration in normal mode = 500
+ * TSB_1000	- Inactive duration in normal mode = 1000
+ * TSB_10	- Inactive duration in normal mode = 10
+ * TSB_20	- Inactive duration in normal mode = 20
+ * FLTR_OFF	- Filter off
+ * FLTR_2	- Filter coefficient = 2
+ * FLTR_4	- Filter coefficient = 4
+ * FLTR_8	- Filter coefficient = 8
+ * FLTR_16	- Filter coefficient = 16 
+ * SPI_EN	- Enables 3-wire SPI
+ * SPI_DIS	- Disables 3-wire SPI
  */
 #define	BME280_CONFIG			0xF5
 #define BME280_TSB_F			0b00000000
@@ -145,43 +145,51 @@
 #define	BME280_SPI_EN			0b00000001
 #define BME280_SPI_DIS			0b00000000
 
-/* Pressure register one contains the msb of the 
- * 	raw pressure data.
+/* Pressure register one contains the MSB of the 
+ * raw pressure data.
+ * Pressure[19:12]
  */
 #define BME280_P_RAW_MSB		0xF7
 
-/* Pressure register two contains the lsb of the
- * 	raw pressure data.
+/* Pressure register two contains the LSB of the
+ * raw pressure data.
+ * Pressure[11:4]
  */
 #define BME280_P_RAW_LSB		0xF8
 
-/* Pressure register three contains the xlsb of
- *	the raw pressure data (bit 7, 6, 5, 4).
+/* Pressure register three contains the xLSB of
+ * the raw pressure data (bit 7, 6, 5, 4).
+ * Pressure[3:0]
  */
 #define	BME280_P_RAW_XLSB		0xF9		
 
-/* Temperature register one contains the msh of 
- * 	the raw temperature data.
+/* Temperature register one contains the MSB of 
+ * the raw temperature data.
+ * Temperature[19:12]
  */
 #define BME280_T_RAW_MSB		0xFA
 
-/* Temperature register two contains the lsb of
- * 	the raw temperature data.
+/* Temperature register two contains the LSB of
+ * the raw temperature data.
+ * Temperature[11:4]
  */
 #define BME280_T_RAW_LSB		0xFB
 
-/* Temperature register three contains the xlsb 
- * 	of the raw temperature data (bit 7, 6, 5, 4).
+/* Temperature register three contains the xLSB 
+ * of the raw temperature data (bit 7, 6, 5, 4).
+ * Temperature[3:0]
  */
 #define	BME280_T_RAW_XLSB		0xFC	
 
-/* Humidity register one contains the msb of the
- * 	raw humidity data.
+/* Humidity register one contains the MSB of the
+ * raw humidity data.
+ * Humidity[15:8]
  */
 #define BME280_H_RAW_MSB		0xFD
 
-/* Humidity register two contains the lsb of the
- *	raw humidity data.
+/* Humidity register two contains the LSB of the
+ * raw humidity data.
+ * Humidity[7:0]
  */
 #define BME280_H_RAW_LSB		0xFE
 
@@ -234,7 +242,6 @@
 /* NOTE: SF = standard and fast modes, HS = high speed mode
  * NOTE: All times are in ns.
  */
-
 #define	BME280_SDI_SETUP_SF		160
 #define BME280_SDI_SETUP_HS		30
 
@@ -263,8 +270,8 @@
 #define BYTE_SHIFT		8
 #define NIB_SHIFT		4
 
-// Opperation Modes
-enum opp_Mode {SLEEP, FORCED, NORMAL};
+// Operation Modes
+enum op_Mode {SLEEP, FORCED, NORMAL};
 
 // Calibration data structure
 struct BME280_Cal_Data {
@@ -320,7 +327,7 @@ class BME280
 		bool get_calibration(void);
 		
 		// this method sets the mode of operation of the BME280
-		bool set_mode (opp_Mode mode);
+		bool set_mode (op_Mode mode);
 		
 		// these methods convert the raw data into human readable formats
 		int32_t convert_pressure (void);

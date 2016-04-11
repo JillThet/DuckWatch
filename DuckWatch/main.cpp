@@ -30,7 +30,7 @@ int main(void)
 	BME280 my_BME280 = BME280(&my_i2c, &ser_dev);
 	
 	/* create a tilt-ball object */
-	TiltBall my_TiltBall = TiltBall(&ser_dev, 2);
+	TiltBall my_TiltBall = TiltBall(&ser_dev, 3);
 	
 	/* create a water temperature sensor - surface */
 	oneWire my_oneWire_surface_temp = oneWire(&ser_dev, 0, ID_SURFACE_TEMP);

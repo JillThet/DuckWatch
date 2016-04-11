@@ -7,7 +7,7 @@
  * Authors:		Jill Thetford, Daniel Griffith
  ****************************************************************************/
 #include "BME280.h"		// header for this file
-#include "shares.h"		// extern globally shared variables
+#include "shares.h"		// extern globally shared variables and macros
 
 /*****************************************************************************
  * Method:		BME280
@@ -15,8 +15,10 @@
  *				with. The method stores a copy of an i2c pointer for use and
  *				calls the init method.
  * 
- * Parameters:	ptr_i2c - the i2c object to be used for communicating with the
- *							BME280 sensor
+ * Parameters:	ptr_i2c		- the i2c object to be used for communicating with
+ *								the BME280 sensor
+ *				ptr_serial	- the serial object to be used for debugging and
+ *								communicating with the WiFi breakout 
  ****************************************************************************/
 BME280::BME280 (i2c* ptr_i2c, serial *ptr_serial)
 {
@@ -37,7 +39,7 @@ BME280::BME280 (i2c* ptr_i2c, serial *ptr_serial)
 
 	if(init())					// initializes the sensor registers
 	{
-		sprintf(debug, "Init failed\r\n");
+		sprintf(debug, "BME280 Init failed\r\n");
 		p_serial->send(debug);
 		return;
 	}
