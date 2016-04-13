@@ -25,9 +25,7 @@ i2c::i2c (serial *ptr_serial)
 	// enable i2c protocol
 	TWCR = (1 << TWEN);
 	
-	sprintf(debug, "i2c constructor ok!\r\n");
-	p_serial->send(debug);
-	
+	DBG(this->p_serial, "i2c constructor OK!\r\n");
 }
 
 /*****************************************************************************
@@ -65,8 +63,7 @@ bool i2c::start (void)
 		if (twcnt > TW_TIMEOUT)
 		{
 			// timeout occurred, error
-			sprintf(debug, "start timed out\r\n");
-			p_serial->send(debug);
+			DBG(this->p_serial, "i2c::start FAILED - timed out\r\n");
 			return true;
 		}
 	}
@@ -75,8 +72,7 @@ bool i2c::start (void)
 	if ((TWSR & STAT_MSK) != STAT_START)
 	{
 		// Status register is not a start signal, error
-		sprintf(debug, "start status (0x%2X) bad\r\n", TWSR);
-		p_serial->send(debug);
+		DBG(this->p_serial, "i2c::start FAILED - status (0x%2X) bad\r\n", TWSR);
 		return true;
 	}
 	
@@ -101,8 +97,7 @@ bool i2c::restart (void)
 		if (twcnt > TW_TIMEOUT)
 		{
 			// timeout occurred, error
-			sprintf(debug, "restart timed out\r\n");
-			p_serial->send(debug);
+			DBG(this->p_serial, "i2c::restart FAILED - timed out\r\n");
 			return true;
 		}
 	}
@@ -111,8 +106,7 @@ bool i2c::restart (void)
 	if ((TWSR & STAT_MSK) != STAT_RESTART)
 	{
 		// Status register is not a repeated start signal, error
-		sprintf(debug, "restart status (0x%2X) bad\r\n", TWSR);
-		p_serial->send(debug);
+		DBG(this->p_serial, "i2c::restart FAILED - status (0x%2X) bad\r\n", TWSR);
 		return true;
 	}
 	
@@ -152,8 +146,7 @@ bool i2c::write_byte (uint8_t data)
 		if (twcnt > TW_TIMEOUT)
 		{
 			// timeout occurred, error
-			sprintf(debug, "write_byte timed out\r\n");
-			p_serial->send(debug);
+			DBG(this->p_serial, "i2c::write_byte FAILED - timed out\r\n");
 			return true;
 		}
 	}
@@ -205,24 +198,10 @@ uint8_t i2c::read_byte (bool ack)
 		if (twcnt > TW_TIMEOUT)
 		{
 			// timeout occurred, error
-			sprintf(debug, "read_byte timed out\r\n");
-			p_serial->send(debug);
+			DBG(this->p_serial, "i2c::read_byte FAILED - timed out\r\n");
 			return 0xFF;
 		}
 	}
-	
-	// check status
-	/*
-	if ((TWSR & STAT_MSK) != expected_response)
-	{
-		// error occurred
-		sprintf(debug, "read_byte status (0x%2X) bad, expected (0x%2X)\r\n",
-		 TWSR & STAT_MSK, expected_response);
-		p_serial->send(debug);
-		return 0xFF;
-	}
-	*/
-	
 	// everything ok, return the data, which is stored in TWDR
 	return TWDR;
 }
@@ -243,9 +222,9 @@ bool i2c::write (uint8_t addr, uint8_t reg, uint8_t data)
 	if (!write_byte(addr) || !write_byte(reg) || !write_byte(data))
 	{
 		// an error occurred, one of these had a NACK
-		sprintf(debug, "NACK on write <addr:0x%2X, reg:0x%2X, data:0x%2X>\r\n",
+		DBG(this->p_serial,
+			"NACK on write <addr:0x%2X, reg:0x%2X, data:0x%2X>\r\n",
 			addr, reg, data);
-		p_serial->send(debug);
 		return true;
 	}
 	stop();
@@ -270,9 +249,8 @@ bool i2c::write (uint8_t addr, uint8_t reg, uint8_t* p_buff, uint8_t count)
 	if (!write_byte(addr) || !write_byte(reg))
 	{
 		// an error occurred, one of these had a NACK
-		sprintf(debug, "NACK on write <addr:0x%2X, reg:0x%2X>\r\n",
-		addr, reg);
-		p_serial->send(debug);
+		DBG(this->p_serial, "NACK on write <addr:0x%2X, reg:0x%2X>\r\n",
+			addr, reg);
 		return true;
 	}
 	// write the data one byte at a time
@@ -281,8 +259,7 @@ bool i2c::write (uint8_t addr, uint8_t reg, uint8_t* p_buff, uint8_t count)
 		if (!write_byte(*p_buff++))
 		{
 			// a NACK happened too early
-			sprintf(debug, "NACK on write data %u\r\n", ndx);
-			p_serial->send(debug);
+			DBG(this->p_serial, "NACK on write data %u\r\n", ndx);
 			return true;
 		}
 	}
@@ -311,20 +288,18 @@ uint8_t i2c::read (uint8_t addr, uint8_t reg)
 	if (!write_byte(addr) || !write_byte(reg))
 	{
 		// an error occurred, one of these had a NACK
-		sprintf(debug, "Write NACK on read <addr:0x%2X, reg:0x%2X>\r\n",
-		addr, reg);
-		p_serial->send(debug);
+		DBG(this->p_serial, "Write NACK on read <addr:0x%2X, reg:0x%2X>\r\n",
+			addr, reg);
 		return 0xFF;
 	}
 	stop();
-	restart();	// change?
+	restart();
 	// read the info
 	if (!write_byte(addr | READ_BIT))
 	{
 		// an error occurred, a NACK was received
-		sprintf(debug, "NACK on read <addr:0x%2X>\r\n",
-		addr | READ_BIT);
-		p_serial->send(debug);
+		DBG(this->p_serial, "NACK on read <addr:0x%2X>\r\n",
+			addr | READ_BIT);
 		return 0xFF;
 	}
 	// read byte with a NACK expected
@@ -351,9 +326,8 @@ bool i2c::read (uint8_t addr, uint8_t reg, uint8_t* p_buff, uint8_t count)
 		if (!write_byte(addr) || !write_byte(reg))
 		{
 			// an error occurred, one of these had a NACK
-			sprintf(debug, "Write NACK on read <addr:0x%2X, reg:0x%2X>\r\n",
-			addr, reg);
-			p_serial->send(debug);
+			DBG(this->p_serial, "Write NACK on read <addr:0x%2X, reg:0x%2X>\r\n",
+				addr, reg);
 			return true;
 		}
 		stop();
@@ -362,9 +336,8 @@ bool i2c::read (uint8_t addr, uint8_t reg, uint8_t* p_buff, uint8_t count)
 		if (!write_byte(addr | READ_BIT))
 		{
 			// an error occurred, a NACK was received
-			sprintf(debug, "NACK on read <addr:0x%2X>\r\n",
-			addr | READ_BIT);
-			p_serial->send(debug);
+			DBG(this->p_serial, "NACK on read <addr:0x%2X>\r\n",
+				addr | READ_BIT);
 			return 0xFF;
 		}
 		

@@ -10,18 +10,45 @@
 
 extern char debug[];
 
-// Macro for making a pin an input
-#define INPUT(ddr, pin) ((ddr) &= ~(1 << (pin)))
-
-// Macro for making a pin an output
-#define OUTPUT(ddr, pin) ((ddr) |= (1 << (pin)))
-
+// Commonly used shift amounts
 #define BYTE_SHIFT	8
 
-/* TODOS
- * Read_byte - trans ack always the status
- * Calibration - Actually implement the read, dummy
- * print out raw values to see if change actually occurring
- */
+/*****************************************************************************
+ * MACRO:		INPUT
+ * Description:	Sets the given pin to an input on the specified port
+ * Parameters:	ddr	- the DDR register associated with the desired port
+ *				p	- the pin on the port to be set to an input
+ ****************************************************************************/
+#define INPUT(ddr, p) ((ddr) &= ~(1 << (p)))
+
+/*****************************************************************************
+ * MACRO:		OUTPUT
+ * Description:	Sets the given pin to an output on the specified port
+ * Parameters:	ddr	- the DDR register associated with the desired port
+ *				p	- the pin on the port to be set to an output
+ ****************************************************************************/
+#define OUTPUT(ddr, p) ((ddr) |= (1 << (p)))
+
+/*****************************************************************************
+ * MACRO:		DBG
+ * Description:	Prints via serial, the debugging message
+ * Parameters:	ser - the serial device to print to
+ *				fmt - the format string
+ *				... - any additional params for the format string
+ ****************************************************************************/ 
+#define DBG(ser, fmt, ... )	{											\
+								sprintf(debug, fmt, ##__VA_ARGS__);	\
+								ser->send((char*)debug);				\
+							}
+
+/*****************************************************************************
+ * MACRO:		TEMP_C_TO_F
+ * Description:	Converts a temperature in C to its equivalent in F.
+ *				The C temp will be in a format such that 2204 is 22.04C
+ *				The F temp will be in the same format -> 7170 is 71.70F
+ * Parameters:	temp	- input temperature in C
+ * Return:		temp_f	- the converted temperature in F
+ ****************************************************************************/ 
+#define TEMP_C_TO_F(temp)	(((temp) * 180) + 3200)
 
 #endif /* __SHARES_H__ */

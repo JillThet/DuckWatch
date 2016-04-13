@@ -27,34 +27,29 @@ BME280::BME280 (i2c* ptr_i2c, serial *ptr_serial)
 	
 	if (p_i2c->ping(BME280_ADDR))
 	{
-		sprintf(debug, "BME280 <0x%X> ALIVE\r\n", BME280_ADDR);
-		p_serial->send(debug);
+		DBG(this->p_serial, "BME280 <0x%X> ALIVE\r\n", BME280_ADDR);
 	}
 	else
 	{
-		sprintf(debug, "BME280 <0x%X> DEAD\r\n", BME280_ADDR);
-		p_serial->send(debug);
+		DBG(this->p_serial, "BME280 <0x%X> DEAD\r\n", BME280_ADDR);
 		return;
 	}
 
 	if(init())					// initializes the sensor registers
 	{
-		sprintf(debug, "BME280 Init failed\r\n");
-		p_serial->send(debug);
+		DBG(this->p_serial, "BME280::BME280 FAILED BME280::init\r\n");
 		return;
 	}
 	
 	if (read_cal())				// read out cal registers for calculations
 	{
-		sprintf(debug, "read_cal failed\r\n");
-		p_serial->send(debug);
+		DBG(this->p_serial, "BME280::BME280 FAILED BME280::read_cal\r\n");
 		return;
 	}
 	
 	read_data();			// initial read of data to fill sensor data
 	
-	sprintf(debug, "BME280 constructor ok!\r\n");
-	p_serial->send(debug);
+	DBG(this->p_serial, "BME280 Constructor OK!\r\n");
 }
 
 /*****************************************************************************
@@ -95,7 +90,7 @@ bool BME280::init (void)
  * Return:		bool - the status of the operation (false = success,
  *													true = failure)	
  ****************************************************************************/
-bool BME280::set_mode (opp_Mode mode)
+bool BME280::set_mode (op_Mode mode)
 {
 	bool stat = false;
 	
@@ -104,9 +99,7 @@ bool BME280::set_mode (opp_Mode mode)
 	if (p_i2c->write(BME280_ADDR, BME280_CTRL_HUM, ctrl_hum))
     {
 		// There was a problem overwriting the humidity 
-		sprintf(debug, "Set mode failed overwriting humidity.\r\n");
-		p_serial->send(debug);
-		
+		DBG(this->p_serial, "BME280::set_mode - FAILED overwriting humidity.\r\n");
 		return true;
 	}
 	
@@ -137,12 +130,41 @@ bool BME280::set_mode (opp_Mode mode)
  *				raw values to the human-readable format are derived from the
  *				compensation formulas in the BME280 Datasheet.
  * 
- * Return:		int32_t - the human-readable pressure reading accurate to ??
+ * Return:		int32_t - the human-readable pressure reading where
+ *						903 is equivalent to 9.03
+ * Return:		int32_t - the human-readable pressure reading accurate to
+ *							2 decimal places in Pascals. A value of 5382 is
+ *							equal to 53.82 Pa
  ****************************************************************************/
 int32_t BME280::convert_pressure (void)
 {
-	// TODO
-	return 0;
+	int64_t var1, var2, p;
+	
+	raw_pres >>= 4;
+	
+	var1 =	((int64_t)cal.t_fine) - 128000;
+	
+	var2 =	var1 * var1 * (int64_t)cal.dig_P6;
+	var2 =	var2 + ((var1*(int64_t)cal.dig_P5) << 17);
+	var2 =	var2 + (((int64_t)cal.dig_P4) << 35);
+	
+	var1 =	((var1 * var1 * (int64_t)cal.dig_P3) >> 8) +
+			((var1 * (int64_t)cal.dig_P2)<<12);
+	var1 =	(((((int64_t)1) << 47) + var1)) * ((int64_t)cal.dig_P1) >> 33;
+	 
+	if (var1 == 0) {
+		return 0;  // avoid exception caused by division by zero 
+	}
+	
+	p = 1048576 - raw_pres;
+	p = (((p << 31) - var2) * 3125) / var1;
+	
+	var1 = (((int64_t)cal.dig_P9) * (p >> 13) * (p >> 13)) >> 25;
+	var2 = (((int64_t)cal.dig_P8) * p) >> 19; 
+	
+	p = ((p + var1 + var2) >> 8) + (((int64_t)cal.dig_P7) << 4);
+	 
+	return p >> 8;
 }
 
 /*****************************************************************************
@@ -158,26 +180,21 @@ int32_t BME280::convert_pressure (void)
  ****************************************************************************/
 int32_t BME280::convert_temperature (void)
 {
-	int32_t x1 = 0;
-	int32_t x2 = 0;
+	int32_t var1 = 0;
+	int32_t var2 = 0;
 	
 	temperature = 0;
 	
 	/* calculate x1 */
-	x1 = (
-		  ((raw_temp >> 3) - ((int32_t)cal.dig_T1 << 1))
-		  * ((int32_t)cal.dig_T2)
-		 ) >> 11;
+	var1 =	((((raw_temp>>3) - ((int32_t)cal.dig_T1 <<1))) *
+		 ((int32_t)cal.dig_T2)) >> 11;
 	
 	/* calculate x2 */
-	x2 = (
-		  ((((raw_temp >> 4) - ((int32_t)cal.dig_T1))
-		   * ((raw_temp >> 4) - ((int32_t)cal.dig_T1))
-		   ) >> 12)
-		  * ((int32_t)cal.dig_T3)
-		 ) >> 14;
+	var2 =	(((((raw_temp>>4) - ((int32_t)cal.dig_T1)) *
+			   ((raw_temp>>4) - ((int32_t)cal.dig_T1))) >> 12) *
+			((int32_t)cal.dig_T3)) >> 14;
 	
-	cal.t_fine = x1 + x2;
+	cal.t_fine = var1 + var2;
 	
 	return ((cal.t_fine * 5 + 128) >> 8);
 }
@@ -195,31 +212,27 @@ int32_t BME280::convert_temperature (void)
  ****************************************************************************/
 uint32_t BME280::convert_humidity (void)
 {
-	int32_t x1 = 0;
+	int32_t var1 = 0;
 	
 	/* Utilize t_fine calculation */
-	x1 = cal.t_fine - 76800;
+	var1 = (cal.t_fine - ((int32_t)76800));
 	
-	/* Calculate x1 - part 1 */
-	x1 = ((((
-			 (raw_hum << 14) - (((int32_t)cal.dig_H4) << 20)
-			 - (((int32_t)cal.dig_H5) * x1)
-			) + ((int32_t)0x4000)) >> 15)
-		  * (((((
-			     ((x1 * ((int32_t)cal.dig_H6)) >> 10)
-			    * (((x1 * ((int32_t)cal.dig_H3)) >> 11) 
-			    + ((int32_t)0x8000))
-		        ) >> 10) + ((int32_t)0x200000))
-			 * ((int32_t)cal.dig_H2) + 0x2000) >> 14));
+	/* Calculate x1 - part	 */
+	var1 =	(((((raw_hum << 14) - (((int32_t)cal.dig_H4) << 20) -
+				(((int32_t)cal.dig_H5) * var1)) + ((int32_t)16384)) >> 15) *
+			 (((((((var1 * ((int32_t)cal.dig_H6)) >> 10) *
+				  (((var1 * ((int32_t)cal.dig_H3)) >> 11)
+				   + ((int32_t)32768))) >> 10) +	
+				((int32_t)2097152)) * ((int32_t)cal.dig_H2) + 8192) >> 14));
+	
 	/* Calculate x1 - part 2 */
-	x1 = (x1 - (((((x1 >> 15)
-				 * (x1 >> 15)) >> 7)
-				* ((int32_t)cal.dig_H1)) >> 4));
+	var1 =	(var1 - (((((var1 >> 15) * (var1 >> 15)) >> 7)
+			 * ((int32_t)cal.dig_H1)) >> 4));
 	
 	/* Check boundaries */
-	x1 = (x1 < 0) ? 0 : ((x1 > 0x19000000) ? 0x19000000 : x1);
+	var1 = (var1 < 0) ? 0 : ((var1 > 419430400) ? 419430400 : var1);
 	
-	return (uint32_t)(x1 >> 12);
+	return (uint32_t)(var1 >> 12);
 }
 
 /*****************************************************************************
@@ -248,36 +261,21 @@ bool BME280::reset (void)
 bool BME280::read_data (void)
 {
 	uint8_t data[NUM_DATA_REG];		// array to hold all of raw data from read
-
-// 	put BME280 into forced mode to read data
-// 		if (set_mode(FORCED))
-// 		{
-// 			sprintf(debug, "read_data set_mode(%d) failed\r\n", FORCED);
-// 			p_serial->send(debug);
-// 			return true;
-// 		}
-	
-	// Check status, and wait for completed read
-// 	while (p_i2c->read(BME280_ADDR, BME280_STATUS) & (1 << BME280_STATUS_MEAS))
-// 	{
-// 		;	// Wait for register to signal a complete read
-// 	}
 	
 	// read in the data from the registers
 	if (p_i2c->read(BME280_ADDR, BME280_P_RAW_MSB, data, NUM_DATA_REG))
 	{
 		// There was an error in the read operation, propagate this message
-		sprintf(debug, "read_data read registers failed\r\n");
-		p_serial->send(debug);
+		DBG(this->p_serial, "BME280::read_data FAILED to read data registers\r\n");
 		return true;
 	}
 	
 	// store data in class variables
 	raw_pres = (int32_t)(
-				((uint32_t)data[NDX_P_MSB]  << P_T_MSB_SHIFT)
-			  | ((uint32_t)data[NDX_P_LSB]  << P_T_LSB_SHIFT)
-			  | (((uint32_t)data[NDX_P_XLSB] >> P_T_XLSB_SHIFT) & 0x0F)
-				);
+						((uint32_t)data[NDX_P_MSB]  << P_T_MSB_SHIFT)
+						| ((uint32_t)data[NDX_P_LSB]  << P_T_LSB_SHIFT)
+						| (((uint32_t)data[NDX_P_XLSB] >> P_T_XLSB_SHIFT) & 0x0F)
+						);
 	
 	raw_temp = (int32_t)(
 						((uint32_t)data[NDX_T_MSB]  << P_T_MSB_SHIFT)
@@ -286,9 +284,9 @@ bool BME280::read_data (void)
 						);
 			  
 	raw_hum  = (int32_t)(
-				((uint32_t)data[NDX_H_MSB] << BYTE_SHIFT)
-			  | ((uint32_t)data[NDX_H_LSB])
-				);
+						((uint32_t)data[NDX_H_MSB] << BYTE_SHIFT)
+						| ((uint32_t)data[NDX_H_LSB])
+						);
 	
 	// convert the raw values into human readable format
 	pressure = convert_pressure();
@@ -316,8 +314,7 @@ bool BME280::read_cal (void)
 	 || p_i2c->read(BME280_ADDR, BME280_CAL_START_2, data2, BME280_CAL_RNG_2))
 	{
 		// There was an error in the read operation, propagate this message
-		sprintf(debug, "read_cal read registers failed\r\n");
-		p_serial->send(debug);
+		DBG(this->p_serial, "BME280::read_cal FAILED to read cal reigsters\r\n");
 		return true;
 	}
 	
@@ -399,17 +396,27 @@ int32_t BME280::get_humidity (void)
 
 void BME280::BME280Task (void)
 {
-	sprintf(debug, "Reading BME280 data...\r\n");
-	p_serial->send(debug);
-	read_data();
+	static uint8_t runs = 0;
 	
-	sprintf(debug, "Humidity reading: %lu (raw: 0x%08lX)\r\n",
-	(uint32_t)get_humidity(), get_raw_humidity());
-	p_serial->send(debug);
+	if ((runs % 3) == 0)
+	{
+		DBG(this->p_serial, "BME280 Task Running\r\n");
+		
+		read_data();
+		
+		DBG(this->p_serial, "Pressure (raw: %ld): %d.%dPa\r\n",
+				raw_pres, (pressure / 100), (pressure % 100));
+		
+		DBG(this->p_serial, "Temperature (raw: %ld): %d.%dC or %d.%dF\r\n",
+				raw_temp, (temperature / 100), (temperature % 100),
+				(TEMP_C_TO_F(temperature) / 100),
+				(TEMP_C_TO_F(temperature) % 100));
+		
+		DBG(this->p_serial, "Humidity (raw: %ld): %d.%d\%\r\n",
+				raw_hum, (humidity / 1024), (humidity % 1024));
+	}
 	
-	sprintf(debug, "Temperature reading: %ld (raw: 0x%08lX)\r\n",
-	(int32_t)get_temperature(),  get_raw_temperature());
-	p_serial->send(debug);
+	runs++;
 	
 	return;
 }

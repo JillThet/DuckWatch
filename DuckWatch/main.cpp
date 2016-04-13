@@ -41,19 +41,13 @@ int main(void)
     /* Replace with your application code */
     while (1) 
     {
-		//my_TiltBall.TiltBallTask();
+		my_BME280.BME280Task();
 		
-		sprintf(debug, "\r\n\r\n");
-		ser_dev.send(debug);
+		my_TiltBall.TiltBallTask();
 		
 		my_oneWire_surface_temp.oneWireTask();
-		
-		sprintf(debug, "\r\n\r\n");
-		ser_dev.send(debug);
-		
+				
 		my_UVIndex.UVIndexTask();
-		
-		//my_BME280.BME280Task();
 		
 		_delay_ms(1000);
     }
