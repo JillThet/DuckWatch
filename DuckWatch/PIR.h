@@ -1,3 +1,9 @@
+/*****************************************************************************
+ * File:		PIR.h
+ * Description:	This file contains the class definition for the PIR class.
+ * Created:		4/13/2016
+ * Authors:		Jill Thetford, Daniel Griffith
+ ****************************************************************************/
 #ifndef __PIR_H__
 #define __PIR_H__
 
@@ -13,6 +19,11 @@
 #define PIR_PORT 	PORTB
 #define PIR_PIN 	PINB
 
+/*****************************************************************************
+ * Class:		PIR
+ * Description:	The PIR class enables the microcontroller to 
+ *				access the PIR sensor.
+ ****************************************************************************/
 class PIR
 {
 	protected:
