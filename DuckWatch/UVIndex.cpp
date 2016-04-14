@@ -1,13 +1,22 @@
-/*
- * UVIndex.cpp
+/*****************************************************************************
+ * File:		UVIndex.cpp
+ * Description:	This file contains the UVIndex class. A UVIndex sensor 
+ *				captures and returns the UV index of its environment
  *
- * Created: 4/10/2016 2:06:39 PM
- *  Author: Jill
- */ 
+ * Created:		4/10/2016
+ * Authors:		Jill Thetford, Daniel Griffith
+ ****************************************************************************/ 
 
 #include "UVIndex.h"
 #include "shares.h"
 
+/*****************************************************************************
+ * Method:		
+ * Description:	
+ *
+ * Parameters:
+ * Return:
+ ****************************************************************************/
 UVIndex::UVIndex (serial *ptr_serial, uint8_t pin)
 {
 	p_serial = ptr_serial;
@@ -16,6 +25,13 @@ UVIndex::UVIndex (serial *ptr_serial, uint8_t pin)
 	init();	
 }
 
+/*****************************************************************************
+ * Method:		
+ * Description:	
+ *
+ * Parameters:
+ * Return:
+ ****************************************************************************/
 void UVIndex::init (void)
 {
 	ADCSRA = 0x87;	//Turn On ADC and set prescaler (CLK/128)
@@ -23,6 +39,13 @@ void UVIndex::init (void)
 	ADMUX = 0x00;   //Set ADC channel ADC0 with 1X gain
 }
 
+/*****************************************************************************
+ * Method:		
+ * Description:	
+ *
+ * Parameters:
+ * Return:
+ ****************************************************************************/
 void UVIndex::enable (void)
 {
 	// set enable pin high
@@ -30,6 +53,13 @@ void UVIndex::enable (void)
 	OUTPUT(UV_EN_DDR, enable_pin);
 }
 
+/*****************************************************************************
+ * Method:		
+ * Description:	
+ *
+ * Parameters:
+ * Return:
+ ****************************************************************************/
 void UVIndex::disable (void)
 {
 	// set enable pin low
@@ -37,6 +67,13 @@ void UVIndex::disable (void)
 	OUTPUT(UV_EN_DDR, enable_pin);
 }
 
+/*****************************************************************************
+ * Method:		
+ * Description:	
+ *
+ * Parameters:
+ * Return:
+ ****************************************************************************/
 int16_t UVIndex::read (void)
 {
 	int16_t value;
@@ -59,6 +96,12 @@ int16_t UVIndex::read (void)
 	return value;
 }
 
+/*****************************************************************************
+ * Method:		UVIndexTask
+ * Description:	This method is run once every loop of the main control and 
+ *				triggers the sensor to take a reading and store the value so
+ *				it can be used by other objects.
+ ****************************************************************************/
 void UVIndex::UVIndexTask (void)
 {
 	static uint8_t runs  = 0;
