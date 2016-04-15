@@ -117,6 +117,10 @@ void oneWire::write_1 (void)
 	_delay_us(55);
 }
 
+/*****************************************************************************
+ * Method:		write_0
+ * Description:	This method writes a logial low to the oneWire device.
+ ****************************************************************************/
 void oneWire::write_0 (void)
 {
 	// set data_line low
@@ -133,6 +137,10 @@ void oneWire::write_0 (void)
 	_delay_us(5);
 }
 
+/*****************************************************************************
+ * Method:		read_byte
+ * Description:	This method reads one byte from the oneWire device.
+ ****************************************************************************/
 uint8_t oneWire::read_byte (void)
 {
 	uint8_t data_in;
@@ -162,11 +170,20 @@ uint8_t oneWire::read_byte (void)
 	return data_read;
 }
 
+/*****************************************************************************
+ * Method:		convert_temp
+ * Description:	This method converts the raw temperature data to human 
+ * 				readable values
+ ****************************************************************************/
 int16_t oneWire::convert_temp(int16_t raw)
 {
 	return (raw * 6) + (raw / 4);
 }
 
+/*****************************************************************************
+ * Method:		oneWireTask
+ * Description:	This method runs the oneWire task
+ ****************************************************************************/
 void oneWire::oneWireTask (void)
 {
 	static uint8_t runs = 0;
