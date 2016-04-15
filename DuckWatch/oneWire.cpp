@@ -27,9 +27,8 @@ oneWire::oneWire(serial *ptr_serial, uint8_t pin, uint8_t id)
 	
 	// make the data an input
 	INPUT(DATA_DDR, data_line);
-	
-	sprintf(debug, "oneWire Constructor ok! Device id: %d\r\n", dev_id);
-	p_serial->send(debug);
+
+	DBG(this->p_serial, "oneWire Constructor ok! Device id: %d\r\n", dev_id);
 }
 
 /*****************************************************************************
@@ -79,7 +78,7 @@ bool oneWire::reset (void)
 /*****************************************************************************
  * Method:		write_byte
  * Description:	This method writes one byte to the oneWire device.
-
+ *
  * Parameters:	data - the data to write to the device
  ****************************************************************************/
 void oneWire::write_byte (uint8_t data)
@@ -98,6 +97,10 @@ void oneWire::write_byte (uint8_t data)
 	}
 }
 
+/*****************************************************************************
+ * Method:		write_1
+ * Description:	This method writes a logial high to the oneWire device.
+ ****************************************************************************/
 void oneWire::write_1 (void)
 {
 	// set data_line low
@@ -189,8 +192,8 @@ void oneWire::oneWireTask (void)
 		temp = (high_byte << BYTE_SHIFT) | low_byte;
 		
 		// TODO - print out to serial
-		sprintf(debug,"temp sensor %d: %d.%d\r\n", dev_id, convert_temp(temp) / 100, convert_temp(temp) % 100);
-		p_serial->send(debug);
+		DBG(this->p_serial, "temp sensor %d: %d.%d\r\n", dev_id, 
+			convert_temp(temp) / 100, convert_temp(temp) & 100);
 	}
 	runs++;
 }
