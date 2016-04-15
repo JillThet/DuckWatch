@@ -11,6 +11,9 @@
 /*****************************************************************************
  * Method:		TiltBall
  * Description:	This constructor sets up the tiltBall sensor on the ATmega328P
+ *
+ * Parameters:	ptr_Serial	- pointer to serial object for debugging
+ *				p			- the pin on which the tiltBall is connected
  ****************************************************************************/
 TiltBall::TiltBall (serial *ptr_serial, uint8_t p)
 {
@@ -21,12 +24,24 @@ TiltBall::TiltBall (serial *ptr_serial, uint8_t p)
 	DBG(this->p_serial, "TiltBall Constructor OK!\r\n");
 }
 
-bool TiltBall::isTilted ()
+/*****************************************************************************
+ * Method:		isTilted
+ * Description:	This method checks the status of the TiltBall Sensor
+ *
+ * Return:		bool - whether or not the sensor is in a tilted state
+ *						(true = tilted, false = not tilted)
+ ****************************************************************************/
+bool TiltBall::isTilted (void)
 {
 	return TILT_PIN & (1 << pin);
 }
 
-void TiltBall::TiltBallTask ()
+/*****************************************************************************
+ * Method:		TiltBallTask
+ * Description:	This method executes the sensor read operation for the 
+ *				TiltBall sensor.
+ ****************************************************************************/
+void TiltBall::TiltBallTask (void)
 {
 	static uint8_t runs = 0;
 	
