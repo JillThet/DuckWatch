@@ -42,7 +42,7 @@ class i2c
 		// No protected methods or class variables
 		
 	private:
-		// No private class variables
+		// debug serial serial connection
 		serial *p_serial;
 		
 		// this method sends a start condition on the i2c bus

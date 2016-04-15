@@ -1,6 +1,17 @@
+/*****************************************************************************
+ * File:		PIR.cpp
+ * Description:	This file contains the PIR class, which allows the 
+ *				microcontroller to communicate with PIR sensors.
+ * Created:		4/13/2016
+ * Authors:		Jill Thetford, Daniel Griffith
+ ****************************************************************************/ 
 #include "PIR.h"
 #include "shares.h"
 
+/*****************************************************************************
+ * Method:		PIR
+ * Description:	This constructor sets up the PIIR sensor.
+ ****************************************************************************/
 PIR::PIR (serial *ptr_serial, uint*_t p)
 {
 	pin = p;
