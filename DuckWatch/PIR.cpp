@@ -10,31 +10,50 @@
 
 /*****************************************************************************
  * Method:		PIR
- * Description:	This constructor sets up the PIIR sensor.
+ * Description:	This constructor sets up the PIR sensor.
+ * Parameters:	ptr_serial	- a reference to the serial debug object
+ *				p 			- the pin on the ATmega328 the sensor outputs to
  ****************************************************************************/
 PIR::PIR (serial *ptr_serial, uint*_t p)
 {
+	// initialize the pin and serial debug object
 	pin = p;
 	p_serial = ptr_serial;
+
+	// sets the pin on the PIR_DDR to an output
 	PIR_DDR &= ~(1 << pin);
 
 	DBG(this->p_serial, "PIR Constructor OK!\r\n");
 }
 
+/*****************************************************************************
+ * Method:		isActive
+ * Description:	This method checks if the sensor is outputting 
+ *				an active signal.
+ *
+ * Return:		bool - state of if an active signal was recieved
+ ****************************************************************************/
 bool PIR::isActive (void) 
 {
 	return PIR_PIN & (1 << pin);
 }
 
+/*****************************************************************************
+ * Method:		PIRTask
+ * Description:	This method runs the PIR task.
+ ****************************************************************************/
 void PIR::PIRTask (void)
 {
 	static uint8_t runs = 0;
 
-	if ((runs & 5) == 0)
+	// Runs once every 5 run cycles
+	if ((runs % 5) == 0)
 	{
 		DBG(this->p_serial, "\r\nPIR Task Running\r\n");
 
 		DBG(this->p_serial, "Sensor is ");
+
+		// check for sensor active
 		if (!isActive())
 		{
 			DBG(this->p_serial, "NOT");
