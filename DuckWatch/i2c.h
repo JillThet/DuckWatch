@@ -33,7 +33,7 @@
 
 /*****************************************************************************
  * Class:		i2c
- * Description:	The i2c class enables the microcontroler to communicate with
+ * Description:	The i2c class enables the microcontroller to communicate with
  *				other i2c devices.
  ****************************************************************************/
 class i2c
@@ -42,6 +42,7 @@ class i2c
 		// No protected methods or class variables
 		
 	private:
+		// debug serial serial connection
 		serial *p_serial;
 		
 		// this method sends a start condition on the i2c bus

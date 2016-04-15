@@ -13,6 +13,7 @@
  * Method:		i2c
  * Description:	This constructor sets up the i2c protocol on the ATmega328P
  *				to operate at a frequency of 200kHz
+ * Parameters:	ptr_serial - a reference to the serial debug object
  ****************************************************************************/
 i2c::i2c (serial *ptr_serial)
 {
