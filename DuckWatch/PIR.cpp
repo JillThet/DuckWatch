@@ -23,7 +23,8 @@ PIR::PIR (serial *ptr_serial, uint8_t p)
 
 	// sets the pin on the PIR_DDR to an output
 	PIR_DDR &= ~(1 << pin);
-
+	DBG(this->p_serial, "Callibrating...\r\n");
+	_delay_ms(30000);
 	DBG(this->p_serial, "PIR Constructor OK!\r\n");
 }
 
@@ -32,7 +33,7 @@ PIR::PIR (serial *ptr_serial, uint8_t p)
  * Description:	This method checks if the sensor is outputting 
  *				an active signal.
  *
- * Return:		bool - state of if an active signal was recieved
+ * Return:		bool - state of if an active signal was received
  ****************************************************************************/
 bool PIR::isActive (void) 
 {
@@ -48,8 +49,9 @@ void PIR::PIRTask (void)
 	static uint8_t runs = 0;
 
 	// Runs once every 5 run cycles
-	if ((runs % 5) == 0)
+	if (true)//(runs % 5) == 0)
 	{
+		/*
 		DBG(this->p_serial, "\r\nPIR Task Running\r\n");
 
 		DBG(this->p_serial, "Sensor is ");
@@ -57,9 +59,19 @@ void PIR::PIRTask (void)
 		// check for sensor active
 		if (!isActive())
 		{
-			DBG(this->p_serial, "NOT");
+			DBG(this->p_serial, "NOT ");
 		}
 		DBG(this->p_serial, "active.\r\n");
+		*/
+		
+		if (isActive())
+		{
+			DBG(this->p_serial, "1");
+		}
+		else
+		{
+			DBG(this->p_serial, "0");
+		}
 	}
 
 	runs++;

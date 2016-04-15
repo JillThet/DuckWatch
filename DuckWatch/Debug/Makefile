@@ -41,6 +41,7 @@ C_SRCS +=  \
 ../i2c.cpp \
 ../main.cpp \
 ../oneWire.cpp \
+../PIR.cpp \
 ../serial.cpp \
 ../TiltBall.cpp \
 ../UVIndex.cpp
@@ -57,6 +58,7 @@ BME280.o \
 i2c.o \
 main.o \
 oneWire.o \
+PIR.o \
 serial.o \
 TiltBall.o \
 UVIndex.o
@@ -66,6 +68,7 @@ BME280.o \
 i2c.o \
 main.o \
 oneWire.o \
+PIR.o \
 serial.o \
 TiltBall.o \
 UVIndex.o
@@ -75,6 +78,7 @@ BME280.d \
 i2c.d \
 main.d \
 oneWire.d \
+PIR.d \
 serial.d \
 TiltBall.d \
 UVIndex.d
@@ -84,6 +88,7 @@ BME280.d \
 i2c.d \
 main.d \
 oneWire.d \
+PIR.d \
 serial.d \
 TiltBall.d \
 UVIndex.d
@@ -102,6 +107,8 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
 
 
 

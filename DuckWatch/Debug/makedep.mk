@@ -10,6 +10,8 @@ main.cpp
 
 oneWire.cpp
 
+PIR.cpp
+
 serial.cpp
 
 TiltBall.cpp

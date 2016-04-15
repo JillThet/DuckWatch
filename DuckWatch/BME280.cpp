@@ -363,42 +363,6 @@ bool BME280::read_cal (void)
 	return false;
 }
 
-/*****************************************************************************
- * Method:		get_pressure
- * Description:	This getter method returns the latest human-readable pressure
- *				reading from the BME280 sensor		
- * 
- * Return:		int32_t - latest pressure reading
- ****************************************************************************/
-int32_t BME280::get_pressure (void)
-{
-	return pressure;
-}
-
-/*****************************************************************************
- * Method:		get_humidity
- * Description:	This getter method returns the latest human-readable 
- *				temperature reading from the BME280 sensor			
- * 
- * Return:		int32_t - latest temperature reading
- ****************************************************************************/
-int32_t BME280::get_temperature (void)
-{
-	return temperature;
-}
-
-/*****************************************************************************
- * Method:		get_humidity
- * Description:	This getter method returns the latest human-readable humidity
- *				reading from the BME280 sensor			
- * 
- * Return:		int32_t - latest humidity reading
- ****************************************************************************/
-int32_t BME280::get_humidity (void)
-{
-	return humidity;
-}
-
 void BME280::BME280Task (void)
 {
 	static uint8_t runs = 0;

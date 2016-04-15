@@ -106,8 +106,7 @@ void UVIndex::UVIndexTask (void)
 	
 	if ((runs % 4) == 0)
 	{
-		sprintf(debug, "UV Index reading: %d\r\n", read());
-		p_serial->send(debug);
+		DBG(this->p_serial, "UV Index reading: %d\r\n", read());
 	}
 	
 	runs++;

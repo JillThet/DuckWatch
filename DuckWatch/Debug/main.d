@@ -19,7 +19,7 @@ main.d main.o: .././main.cpp \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\math.h \
  .././serial.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\stdlib.h \
- .././BME280.h .././TiltBall.h .././oneWire.h .././UVIndex.h \
+ .././BME280.h .././TiltBall.h .././oneWire.h .././UVIndex.h .././PIR.h \
  .././shares.h
 
 c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\io.h:
@@ -69,5 +69,7 @@ c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\
 .././oneWire.h:
 
 .././UVIndex.h:
+
+.././PIR.h:
 
 .././shares.h:
