@@ -30,7 +30,7 @@ class PIR
 		// No protected methods or class variables
 
 	private:
-		// debug serial serial connection
+		// serial debug connection
 		serial *p_serial;
 
 		// PIR data out pin
@@ -39,7 +39,7 @@ class PIR
 	public:
 		// No public class variables
 
-		// this is the constructor sets up the PIR for use
+		// this constructor sets up the PIR for use
 		PIR (serial *ptr_serial, uint8_t p);
 
 		// this method runs the PIR task

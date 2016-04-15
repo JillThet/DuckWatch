@@ -11,10 +11,11 @@
 /*****************************************************************************
  * Method:		PIR
  * Description:	This constructor sets up the PIR sensor.
+ * 
  * Parameters:	ptr_serial	- a reference to the serial debug object
- *				p 			- the pin on the ATmega328 the sensor outputs to
+ *				p 			- the pin on the ATmega328P the sensor outputs to
  ****************************************************************************/
-PIR::PIR (serial *ptr_serial, uint*_t p)
+PIR::PIR (serial *ptr_serial, uint8_t p)
 {
 	// initialize the pin and serial debug object
 	pin = p;
