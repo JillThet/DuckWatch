@@ -8,7 +8,7 @@
 #ifndef __SHARES_H__
 #define __SHARES_H__
 
-extern char debug[];
+extern char dbg_str[];
 
 // Commonly used shift amounts
 #define BYTE_SHIFT	8
@@ -37,8 +37,8 @@ extern char debug[];
  *				... - any additional params for the format string
  ****************************************************************************/ 
 #define DBG(ser, fmt, ... )	{											\
-								sprintf(debug, fmt, ##__VA_ARGS__);	\
-								ser->send((char*)debug);				\
+								sprintf(dbg_str, fmt, ##__VA_ARGS__);	\
+								ser->send((char*)dbg_str);				\
 							}
 
 /*****************************************************************************

@@ -18,8 +18,8 @@
  ****************************************************************************/
 serial::serial (uint16_t baud, uint32_t clk)
 {
-	baud_rate = baud;		// store a local copy
-	clk_speed = clk;		// store a local copy
+	baud_rate = baud;		// store a local copy of baud rate
+	clk_speed = clk;		// store a local copy of clock speed of device
 	
 	init();
 }
@@ -113,7 +113,7 @@ uint8_t serial::send (char *str)
  *				is data available, and returns it.
  * 
  * Return:		uint8_t - the data received from the RX line, or 0xFF if an
- *				error occurs (i.e. data not ready)
+ *					error occurs (i.e. data not ready)
  ****************************************************************************/
 uint8_t serial::receive (void)
 {

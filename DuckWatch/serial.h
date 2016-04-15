@@ -53,7 +53,4 @@ class serial
 		bool data_available (void);
 	
 };
-
-
-
 #endif /* __SERIAL_H__ */
