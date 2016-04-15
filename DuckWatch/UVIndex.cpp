@@ -14,8 +14,8 @@
  * Method:		
  * Description:	
  *
- * Parameters:
- * Return:
+ * Parameters:	ptr_serial	- pointer to serial object for debugging
+ *				pin			- the pin to be associated with the enable pin
  ****************************************************************************/
 UVIndex::UVIndex (serial *ptr_serial, uint8_t pin)
 {
@@ -26,25 +26,22 @@ UVIndex::UVIndex (serial *ptr_serial, uint8_t pin)
 }
 
 /*****************************************************************************
- * Method:		
- * Description:	
- *
- * Parameters:
- * Return:
+ * Method:		init
+ * Description:	This method initializes the internal Analog to Digital 
+ *				Converter (ADC) to use a prescaler of 128 with no auto trigger
+ *				and a gain of 1X
  ****************************************************************************/
 void UVIndex::init (void)
 {
 	ADCSRA = 0x87;	//Turn On ADC and set prescaler (CLK/128)
-	ADCSRB = 0x00;	//Set gain & turn off autotrigger
+	ADCSRB = 0x00;	//Set gain & turn off auto trigger
 	ADMUX = 0x00;   //Set ADC channel ADC0 with 1X gain
 }
 
 /*****************************************************************************
- * Method:		
- * Description:	
- *
- * Parameters:
- * Return:
+ * Method:		enable
+ * Description:	This method sets the enable pin high to enable the UVIndex 
+ *				sensor
  ****************************************************************************/
 void UVIndex::enable (void)
 {
@@ -54,11 +51,9 @@ void UVIndex::enable (void)
 }
 
 /*****************************************************************************
- * Method:		
- * Description:	
- *
- * Parameters:
- * Return:
+ * Method:		disable
+ * Description:	This method sets the enable pin to low to disable the UVIndex
+ *				sensor
  ****************************************************************************/
 void UVIndex::disable (void)
 {
@@ -68,11 +63,14 @@ void UVIndex::disable (void)
 }
 
 /*****************************************************************************
- * Method:		
- * Description:	
+ * Method:		read
+ * Description:	This method reads a single value from the UVIndex Sensor. The
+ *				sensor is first enabled, then a delay is included for the 
+ *				stabilization period. Once a reading has been collected, the
+ *				sensor is disabled.
  *
- * Parameters:
- * Return:
+ * Return:		int16_t - the digital value of the analog read of the UV Index
+ *					where a value of 302 is equivalent to 3.02
  ****************************************************************************/
 int16_t UVIndex::read (void)
 {
