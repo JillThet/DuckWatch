@@ -15,15 +15,16 @@
  *				with. The method stores a copy of an i2c pointer for use and
  *				calls the init method.
  * 
- * Parameters:	ptr_i2c		- the i2c object to be used for communicating with
- *								the BME280 sensor
- *				ptr_serial	- the serial object to be used for debugging and
- *								communicating with the WiFi breakout 
+ * Parameters:	ptr_i2c		- pointer to an i2c object to be used for 
+ *								communicating with the BME280 sensor
+ *				ptr_serial	- pointer to a serial object to be used for
+ *								debugging
  ****************************************************************************/
-BME280::BME280 (i2c* ptr_i2c, serial *ptr_serial)
+BME280::BME280 (i2c* ptr_i2c, serial *ptr_serial, int32_t temperature_cal)
 {
-	p_i2c = ptr_i2c;		// store a local copy of the i2c pointer for use
-	p_serial = ptr_serial;	// store a local copy of serial pointer for debug
+	p_i2c = ptr_i2c;			// store local copy of i2c pointer for use
+	p_serial = ptr_serial;		// store local copy of serial pointer for debug
+	temp_cal = temperature_cal;	// store local copy of temp cal
 	
 	if (p_i2c->ping(BME280_ADDR))
 	{
@@ -35,19 +36,22 @@ BME280::BME280 (i2c* ptr_i2c, serial *ptr_serial)
 		return;
 	}
 
-	if(init())					// initializes the sensor registers
+	// initialize the sensor registers
+	if(init())
 	{
 		DBG(this->p_serial, "BME280::BME280 FAILED BME280::init\r\n");
 		return;
 	}
 	
-	if (read_cal())				// read out cal registers for calculations
+	// read out cal registers for calculations
+	if (read_cal())
 	{
 		DBG(this->p_serial, "BME280::BME280 FAILED BME280::read_cal\r\n");
 		return;
 	}
 	
-	read_data();			// initial read of data to fill sensor data
+	// initial read of data to fill sensor data
+	read_data();
 	
 	DBG(this->p_serial, "BME280 Constructor OK!\r\n");
 }
@@ -59,9 +63,9 @@ BME280::BME280 (i2c* ptr_i2c, serial *ptr_serial)
  *				registers to setup the sampling rates and mode. 
  *				The pressure, temperature, and humidity will all be set to
  *				have an oversampling rate of 1. The mode will be initialized
- *				sleep. The configuration will be set to turn the IIR filter
- *				off, set the sample interval to 1s in normal mode, and disable
- *				SPI.
+ *				normal mode. The configuration will be set to turn the IIR 
+ *				filter off, set the sample interval to 1s in normal mode, and 
+ *				disable SPI.
  * 
  * Return:		bool - the status of the operation (false = success,
  *													true = failure)
@@ -70,7 +74,7 @@ bool BME280::init (void)
 {
 	/* 1. Set up ctrl_hum register to oversample humidity by 1
 	 * 2. Set up ctrl_meas register to oversample pressure and temperature
-	 *    by 1 and set mode to sleep
+	 *    by 1 and set mode to normal
 	 * 3. Turn off IIR Filter and set inactive duration to 1s for normal
 	 *	  mode
 	 */
@@ -99,7 +103,8 @@ bool BME280::set_mode (op_Mode mode)
 	if (p_i2c->write(BME280_ADDR, BME280_CTRL_HUM, ctrl_hum))
     {
 		// There was a problem overwriting the humidity 
-		DBG(this->p_serial, "BME280::set_mode - FAILED overwriting humidity.\r\n");
+		DBG(this->p_serial,
+			"BME280::set_mode - FAILED overwriting humidity.\r\n");
 		return true;
 	}
 	
@@ -128,10 +133,9 @@ bool BME280::set_mode (op_Mode mode)
  * Description:	This method converts the raw pressure data into a 
  *				human-readable format. The formulas used for converting the
  *				raw values to the human-readable format are derived from the
- *				compensation formulas in the BME280 Datasheet.
+ *				compensation formulas in the BME280 Datasheet 
+ *				(https://cdn-shop.adafruit.com/product-files/2652/2652.pdf).
  * 
- * Return:		int32_t - the human-readable pressure reading where
- *						903 is equivalent to 9.03
  * Return:		int32_t - the human-readable pressure reading accurate to
  *							2 decimal places in Pascals. A value of 5382 is
  *							equal to 53.82 Pa
@@ -172,7 +176,8 @@ int32_t BME280::convert_pressure (void)
  * Description:	This method converts the raw temperature data into a 
  *				human-readable format. The formulas used for converting the
  *				raw values to the human-readable format are derived from the
- *				compensation formulas in the BME280 Datasheet.
+ *				compensation formulas in the BME280 Datasheet
+ *				(https://cdn-shop.adafruit.com/product-files/2652/2652.pdf).
  * 
  * Return:		int32_t - the human-readable temperature reading accurate to
  *							2 decimal places in Centigrade. A value of 5382 is
@@ -196,7 +201,7 @@ int32_t BME280::convert_temperature (void)
 	
 	cal.t_fine = var1 + var2;
 	
-	return ((cal.t_fine * 5 + 128) >> 8);
+	return ((cal.t_fine * 5 + 128) >> 8) - temp_cal;
 }
 
 /*****************************************************************************
@@ -417,6 +422,5 @@ void BME280::BME280Task (void)
 	}
 	
 	runs++;
-	
 	return;
 }

@@ -21,14 +21,13 @@
 /*****************************************************************************
  * Registers
  ****************************************************************************/
-
 /* ID register contains chip id number, should be 0x60. 
- * 	Can be read as soon as device finished power-on-reset (POR).
+ * Can be read as soon as device finished power-on-reset (POR).
  */
 #define BME280_ID 				0xD0
 
-/*
- * Reset register controls device reset.
+/* Reset register controls device reset.
+ *
  * RESET_POR 	- device reset using power-on-reset procedure when 
  * 			   		this is written to register.
  */
@@ -36,8 +35,9 @@
 #define BME280_RESET_POR		0xB6
 
 /* Humidity control register sets the humidity data acquisition
- * 	options of the device. Changes to register only become effective
- *	after a write to CTRL_MEAS register.
+ * options of the device. Changes to register only become effective
+ * after a write to CTRL_MEAS register.
+ *
  * H_OVSM_S 	- Humidity oversampling skipped (output set to 0x8000)
  * H_OVSM_1 	- Humidity oversampling x1
  * H_OVSM_2 	- Humidity oversampling x2
@@ -54,6 +54,7 @@
 #define BME280_H_OVSM_16		0x05
 
 /* Status register indicates the status of the device.
+ * 
  * STATUS_MEAS 		- Data ready status bit, 
  * 						0 = data ready, 1 = conversion running
  * STATUS_UPDATE 	- Image update status bit,
@@ -64,8 +65,9 @@
 #define BME280_STATUS_UPDATE	0
 
 /* Measurement control register controls pressure and
- * 	temperature data acquisition. Must be written after
- *	changing CTRL_HUM for changes to become effective.
+ * temperature data acquisition. Must be written after
+ * changing CTRL_HUM for changes to become effective.
+ * 
  * P_OVSM_S 	- Pressure oversampling skipped 
  * 					(output set to 0x80000)
  * P_OVSM_1 	- Pressure oversampling x1
@@ -108,8 +110,9 @@
 #define BME280_NORMAL_MODE		0b00000011
 
 /* Config register controls the rate, filter, and interface 
- * 	options of the device. NOTE: writes to register in normal 
- *	mode may be ignored. In sleep mode writes are not ignored.
+ * options of the device. NOTE: writes to register in normal 
+ * mode may be ignored. In sleep mode writes are not ignored.
+ * 
  * TSB_F	- Inactive duration in normal mode = 0.5
  * TSB_62F	- Inactive duration in normal mode = 62.5
  * TSB_125	- Inactive duration in normal mode = 125
@@ -312,10 +315,12 @@ class BME280
 	private:
 		i2c* p_i2c;				// pointer to i2c object for communication
 		serial* p_serial;		// pointer to serial object for debugging
+		
+		int32_t temp_cal;		// temperature calibration constant
 
 		int32_t raw_pres;		// raw pressure data from BME280
 		int32_t raw_temp;		// raw temperature data from BME280
-		int16_t raw_hum;		// raw adc output humidity data from BME280
+		int16_t raw_hum;		// raw humidity data from BME280
 		
 		int32_t pressure;		// scaled and shifted pressure reading
 		int32_t temperature;	// scaled and shifted temperature reading
@@ -341,9 +346,9 @@ class BME280
 		// No public class variables
 
 		// this constructor sets up a BME280 sensor
-		BME280 (i2c* ptr_i2c, serial* ptr_serial);
+		BME280 (i2c* ptr_i2c, serial* ptr_serial, int32_t temperature_cal);
 
-		// this method initializes the BME280 to the specified mode
+		// this method initializes the BME280
 		bool init (void);
 		
 		// this method resets the sensor
@@ -353,13 +358,17 @@ class BME280
 		bool read_data (void);
 		
 		// Getter Methods
-		int32_t get_pressure (void);
-		int32_t get_temperature (void);
-		int32_t get_humidity (void);
+		int32_t get_pressure (void)			{ return pressure;		};
+		int32_t get_temperature (void)		{ return temperature;	};
+		int32_t get_humidity (void)			{ return humidity;		};
+		int32_t get_temp_cal (void)			{ return temp_cal;		};
 
-		int32_t get_raw_pressure(void) { return raw_pres; };
-		int32_t get_raw_temperature(void) { return raw_temp; };
-		uint32_t get_raw_humidity(void) { return raw_hum; };
+		int32_t get_raw_pressure(void)		{ return raw_pres;		};
+		int32_t get_raw_temperature(void)	{ return raw_temp;		};
+		uint32_t get_raw_humidity(void)		{ return raw_hum;		};
+			
+		// setter methods
+		void set_temp_cal (int32_t new_temp_cal);
 			
 		// task method
 		void BME280Task (void);
