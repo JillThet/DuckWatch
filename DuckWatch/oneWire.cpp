@@ -1,13 +1,24 @@
-/*
- * oneWire.cpp
- *
- * Created: 4/8/2016 4:13:19 PM
- *  Author: Jill
- */ 
+/*****************************************************************************
+ * File:		oneWire.cpp
+ * Description:	This file contains the oneWire class, which allows the 
+ *				microcontroller to communicate with other oneWire devices 
+ * 				via the Dallas One Wire protocol.
+ * Created:		4/8/2016
+ * Authors:		Jill Thetford, Daniel Griffith
+ ****************************************************************************/ 
 
 #include "oneWire.h"
 #include "shares.h"
 
+/*****************************************************************************
+ * Method:		oneWire
+ * Description:	This constructor sets up the oneWire protocol on the 
+ *				ATmega328P.
+ * 
+ * Parameters:	ptr_serial 	- a reference to the serial debug object
+ *				pin 		- the pin on the ATmega328P the sensor outputs to.
+ *				id 			- the unique id of the sensor
+ ****************************************************************************/
 oneWire::oneWire(serial *ptr_serial, uint8_t pin, uint8_t id)
 {
 	p_serial = ptr_serial;	// store local copy for debug
@@ -21,6 +32,12 @@ oneWire::oneWire(serial *ptr_serial, uint8_t pin, uint8_t id)
 	p_serial->send(debug);
 }
 
+/*****************************************************************************
+ * Method:		reset
+ * Description:	This method resets the oneWire device.
+ *
+ * Return:		bool - if the device is ready.
+ ****************************************************************************/
 bool oneWire::reset (void)
 {
 	bool presence_pulse;
@@ -59,6 +76,12 @@ bool oneWire::reset (void)
 	return presence_pulse;
 }
 
+/*****************************************************************************
+ * Method:		write_byte
+ * Description:	This method writes one byte to the oneWire device.
+
+ * Parameters:	data - the data to write to the device
+ ****************************************************************************/
 void oneWire::write_byte (uint8_t data)
 {
 	for (uint8_t i = 0; i < 8; i++)

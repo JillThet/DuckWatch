@@ -63,7 +63,7 @@ class i2c
 	public:
 		// No public class variables
 		
-		// this is the constructor sets up the i2c for use
+		// this constructor sets up the i2c for use
 		i2c (serial *ptr_serial);
 		
 		// this method checks if a sensor is alive at the given address
