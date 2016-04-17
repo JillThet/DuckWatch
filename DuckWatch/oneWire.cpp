@@ -190,9 +190,12 @@ void oneWire::oneWireTask (void)
 	
 	uint8_t low_byte, high_byte;
 	int16_t temp;
+	int32_t temp_f;
 	
 	if ((runs % 5) == 0)
 	{
+		DBG(this->p_serial, "\r\nRunning oneWireTask\r\n");
+		
 		// perform temperature conversion
 		reset();
 		write_byte(0xCC);	// skip ROM
@@ -207,10 +210,12 @@ void oneWire::oneWireTask (void)
 		low_byte = read_byte();
 		high_byte = read_byte();
 		temp = (high_byte << BYTE_SHIFT) | low_byte;
+		temp = convert_temp(temp);
+		temp_f = TEMP_C_TO_F((int32_t)temp);
 		
-		// TODO - print out to serial
-		DBG(this->p_serial, "temp sensor %d: %d.%d\r\n", dev_id, 
-			convert_temp(temp) / 100, convert_temp(temp) & 100);
+		DBG(this->p_serial, "temp sensor %d: %d.%02dC or %ld.%02ldF\r\n", dev_id, 
+			(temp / 100), (temp % 100),
+			(temp_f / 100), (temp_f % 100));
 	}
 	runs++;
 }

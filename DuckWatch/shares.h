@@ -49,6 +49,6 @@ extern char dbg_str[];
  * Parameters:	temp	- input temperature in C
  * Return:		temp_f	- the converted temperature in F
  ****************************************************************************/ 
-#define TEMP_C_TO_F(temp)	(((temp) * 180) + 3200)
+#define TEMP_C_TO_F(temp)	((((temp) * 9) + 16000) / 5)
 
 #endif /* __SHARES_H__ */

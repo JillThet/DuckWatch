@@ -201,7 +201,7 @@ int32_t BME280::convert_temperature (void)
 	
 	cal.t_fine = var1 + var2;
 	
-	return ((cal.t_fine * 5 + 128) >> 8) - temp_cal;
+	return (((cal.t_fine * 5 + 128) >> 8) - temp_cal);
 }
 
 /*****************************************************************************
@@ -217,12 +217,12 @@ int32_t BME280::convert_temperature (void)
  ****************************************************************************/
 uint32_t BME280::convert_humidity (void)
 {
-	int32_t var1 = 0;
+	int32_t var1;
 	
 	/* Utilize t_fine calculation */
 	var1 = (cal.t_fine - ((int32_t)76800));
 	
-	/* Calculate x1 - part	 */
+	/* Calculate var1 - part 1	 */
 	var1 =	(((((raw_hum << 14) - (((int32_t)cal.dig_H4) << 20) -
 				(((int32_t)cal.dig_H5) * var1)) + ((int32_t)16384)) >> 15) *
 			 (((((((var1 * ((int32_t)cal.dig_H6)) >> 10) *
@@ -230,14 +230,16 @@ uint32_t BME280::convert_humidity (void)
 				   + ((int32_t)32768))) >> 10) +	
 				((int32_t)2097152)) * ((int32_t)cal.dig_H2) + 8192) >> 14));
 	
-	/* Calculate x1 - part 2 */
-	var1 =	(var1 - (((((var1 >> 15) * (var1 >> 15)) >> 7)
-			 * ((int32_t)cal.dig_H1)) >> 4));
+	/* Calculate var1 - part 2 */
+	var1 = (var1 - (((((var1 >> 15) * (var1 >> 15)) >> 7)
+			* ((int32_t)cal.dig_H1)) >> 4));
 	
-	/* Check boundaries */
-	var1 = (var1 < 0) ? 0 : ((var1 > 419430400) ? 419430400 : var1);
 	
-	return (uint32_t)(var1 >> 12);
+	/* Check boundaries */	
+	var1 = (var1 < 0 ? 0 : var1);
+	var1 = (var1 > 419430400 ? 419430400 : var1);
+	
+	return (uint32_t)((var1 >> 12));
 }
 
 /*****************************************************************************
@@ -366,23 +368,25 @@ bool BME280::read_cal (void)
 void BME280::BME280Task (void)
 {
 	static uint8_t runs = 0;
+	int32_t temp_f;
 	
-	if ((runs % 3) == 0)
+	if ((runs % 5) == 0)
 	{
-		DBG(this->p_serial, "BME280 Task Running\r\n");
+		DBG(this->p_serial, "\r\nBME280 Task Running\r\n");
 		
 		read_data();
 		
-		DBG(this->p_serial, "Pressure (raw: %ld): %d.%dPa\r\n",
-				raw_pres, (pressure / 100), (pressure % 100));
+		temp_f = TEMP_C_TO_F(temperature);	
 		
-		DBG(this->p_serial, "Temperature (raw: %ld): %d.%dC or %d.%dF\r\n",
-				raw_temp, (temperature / 100), (temperature % 100),
-				(TEMP_C_TO_F(temperature) / 100),
-				(TEMP_C_TO_F(temperature) % 100));
+		DBG(this->p_serial, "Temperature: %ld.%02ldC or %ld.%02ldF\r\n",
+				(temperature / 100), (temperature % 100),
+				(temp_f / 100), (temp_f % 100));
 		
-		DBG(this->p_serial, "Humidity (raw: %ld): %d.%d\%\r\n",
-				raw_hum, (humidity / 1024), (humidity % 1024));
+		DBG(this->p_serial, "Humidity: %lu.%lu%%\r\n",
+			(humidity / 1024), (humidity % 1024));
+			
+		DBG(this->p_serial, "Pressure: %luPa\r\n",
+			pressure);
 	}
 	
 	runs++;

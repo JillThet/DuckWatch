@@ -24,38 +24,42 @@ int main(void)
 	/* create serial object */
 	serial ser_dev = serial(9600, 16000000);
 	
-	/*
 	// create a i2c object 
 	i2c my_i2c = i2c(&ser_dev);
 	
 	// create a BME280 object
-	BME280 my_BME280 = BME280(&my_i2c, &ser_dev);
+	BME280 my_BME280 = BME280(&my_i2c, &ser_dev, 278);
 	
+	
+	// create a water temperature sensor - surface
+	oneWire my_oneWire_surface_temp = oneWire(&ser_dev, 0, ID_SURFACE_TEMP);
+	
+	/*
 	// create a tilt-ball object
 	TiltBall my_TiltBall = TiltBall(&ser_dev, 3);
 	
-	// create a water temperature sensor - surface 
-	oneWire my_oneWire_surface_temp = oneWire(&ser_dev, 0, ID_SURFACE_TEMP);
-	
 	// create a UVIndex sensor
 	UVIndex my_UVIndex = UVIndex(&ser_dev, 7);
-	*/
+	
 	// create a PIR sensor 
 	PIR my_pir_ln1 = PIR(&ser_dev, 2);
+	*/
 	
     while (1) 
     {
-		/*
+		
 		my_BME280.BME280Task();
 		
-		my_TiltBall.TiltBallTask();
-		
 		my_oneWire_surface_temp.oneWireTask();
+		
+		/*
+		my_TiltBall.TiltBallTask();
 				
 		my_UVIndex.UVIndexTask();
-		*/
 		
 		my_pir_ln1.PIRTask();
+		*/
+		
 		_delay_ms(1000);
     }
 }

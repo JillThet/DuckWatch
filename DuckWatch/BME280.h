@@ -320,7 +320,7 @@ class BME280
 
 		int32_t raw_pres;		// raw pressure data from BME280
 		int32_t raw_temp;		// raw temperature data from BME280
-		int16_t raw_hum;		// raw humidity data from BME280
+		int32_t raw_hum;		// raw humidity data from BME280
 		
 		int32_t pressure;		// scaled and shifted pressure reading
 		int32_t temperature;	// scaled and shifted temperature reading
