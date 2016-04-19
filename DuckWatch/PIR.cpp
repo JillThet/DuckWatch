@@ -24,12 +24,22 @@ PIR::PIR (serial *ptr_serial, uint8_t p)
 	// sets the pin on the PIR_DDR to an output
 	//OUTPUT(PIR_DDR, pin);
 	
+	initPIR();
+
 	// Make PIR an Input
 	INPUT(PIR_DDR, pin);
 	
 	DBG(this->p_serial, "PIR Calibrating...");
 	_delay_ms(30000);
 	DBG(this->p_serial, "PIR Constructor OK!\r\n");
+}
+
+void PIR::initPIR (void)
+{
+	PCICR |= 1 << PCIE2;
+	PCMSK2 |= 1 << pin; // PCINTx
+	PCIFR = 1 << PCIF2;
+	sei();
 }
 
 /*****************************************************************************
@@ -83,4 +93,28 @@ void PIR::PIRTask (void)
 	}
 
 	runs++;
+}
+
+ISR (PCINT2_vect)
+{
+	uint8_t changedBits;
+	cli();
+
+	changedBits = PIR_PIN ^ portd_hist;
+	portd_hist = PIR_PIN;
+
+	if (changedBits & (1 << LN_1_PIN))
+	{
+		// Lane 1 changed state
+
+		// clear timer
+	}
+	else if (changedBits & (1 << LN_2_PIN))
+	{
+		// Lane 2 changed state
+
+		// clear timer
+	}
+
+	sei();
 }
