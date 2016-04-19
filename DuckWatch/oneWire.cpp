@@ -194,7 +194,7 @@ void oneWire::oneWireTask (void)
 	
 	if ((runs % 5) == 0)
 	{
-		DBG(this->p_serial, "\r\nRunning oneWireTask\r\n");
+		DBG(this->p_serial, "\r\noneWire Task Running\r\n");
 		
 		// perform temperature conversion
 		reset();
@@ -213,7 +213,8 @@ void oneWire::oneWireTask (void)
 		temp = convert_temp(temp);
 		temp_f = TEMP_C_TO_F((int32_t)temp);
 		
-		DBG(this->p_serial, "temp sensor %d: %d.%02dC or %ld.%02ldF\r\n", dev_id, 
+		DBG(this->p_serial, "Temp sensor %d: %d.%02dC or %ld.%02ldF\r\n",
+			dev_id, 
 			(temp / 100), (temp % 100),
 			(temp_f / 100), (temp_f % 100));
 	}

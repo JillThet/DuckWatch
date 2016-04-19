@@ -15,9 +15,9 @@
 #include "serial.h"
 #include "shares.h"
 
-#define PIR_DDR		DDRB
-#define PIR_PORT 	PORTB
-#define PIR_PIN 	PINB
+#define PIR_DDR		DDRD
+#define PIR_PORT 	PORTD
+#define PIR_PIN 	PIND
 
 /*****************************************************************************
  * Class:		PIR

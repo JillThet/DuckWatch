@@ -19,7 +19,7 @@ TiltBall::TiltBall (serial *ptr_serial, uint8_t p)
 {
 	pin = p;					// store local copy of tilt ball pin
 	p_serial = ptr_serial;		// store local copy of serial for debug
-	TILT_DDR &= ~(1 << pin);	// Make tilt ball an input
+	INPUT(TILT_DDR, pin);		// Make tilt ball an input
 	
 	DBG(this->p_serial, "TiltBall Constructor OK!\r\n");
 }
@@ -52,7 +52,7 @@ void TiltBall::TiltBallTask (void)
 		DBG(this->p_serial, "Sensor is ");
 		if (!isTilted())
 		{
-			DBG(this->p_serial, "NOT");
+			DBG(this->p_serial, "NOT ");
 		}
 		DBG(this->p_serial, "tilted.\r\n");
 	}
