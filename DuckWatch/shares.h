@@ -8,10 +8,21 @@
 #ifndef __SHARES_H__
 #define __SHARES_H__
 
+// Debugging String
 extern char dbg_str[];
 
 // Commonly used shift amounts
 #define BYTE_SHIFT	8
+
+// Globally shared variables for PIR
+extern uint8_t lane_states;
+extern volatile uint8_t portd_hist;
+extern volatile uint8_t ln_1_tmr_cnt;
+extern volatile uint8_t ln_2_tmr_cnt;
+
+// TODO - Implement PIR timers
+// TODO - initialize global variables
+
 
 /*****************************************************************************
  * MACRO:		INPUT

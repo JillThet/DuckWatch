@@ -36,13 +36,13 @@ int main(void)
 	oneWire my_oneWire_surface_temp = oneWire(&ser_dev, 0, ID_SURFACE_TEMP);
 	
 	// create a tilt-ball object
-	TiltBall my_TiltBall = TiltBall(&ser_dev, 3);
+	TiltBall my_TiltBall = TiltBall(&ser_dev, 0);
 	
 	// create a UVIndex sensor
 	UVIndex my_UVIndex = UVIndex(&ser_dev, 7);
 	
 	// create a PIR sensor 
-	PIR my_pir_ln1 = PIR(&ser_dev, 6);
+	PIR my_pir_ln1 = PIR(&ser_dev, LN_1_PIN);
 	
 	DBG(&ser_dev, "All Sensors created!\r\n");
 	

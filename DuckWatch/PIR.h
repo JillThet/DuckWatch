@@ -11,13 +11,18 @@
 
 #include <stdio.h>
 #include <avr/io.h>
+#include <avr/interrupt.h>
 #include <util/delay.h>
+
 #include "serial.h"
 #include "shares.h"
 
 #define PIR_DDR		DDRD
 #define PIR_PORT 	PORTD
 #define PIR_PIN 	PIND
+
+#define LN_1_PIN	5
+#define LN_2_PIN	6	
 
 /*****************************************************************************
  * Class:		PIR

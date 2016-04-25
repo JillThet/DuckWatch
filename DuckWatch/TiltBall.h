@@ -14,9 +14,9 @@
 #include <util/delay.h>
 #include "serial.h"
 
-#define TILT_DDR	DDRD
-#define TILT_PORT	PORTD
-#define TILT_PIN	PIND
+#define TILT_DDR	DDRB
+#define TILT_PORT	PORTB
+#define TILT_PIN	PINB
 
 /*****************************************************************************
  * Class:		TiltBall
