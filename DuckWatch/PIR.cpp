@@ -21,24 +21,87 @@ PIR::PIR (serial *ptr_serial, uint8_t p)
 	pin = p;
 	p_serial = ptr_serial;
 
-	// sets the pin on the PIR_DDR to an output
-	//OUTPUT(PIR_DDR, pin);
-	
-	initPIR();
 
 	// Make PIR an Input
 	INPUT(PIR_DDR, pin);
 	
-	DBG(this->p_serial, "PIR Calibrating...");
+	switch (pin)
+	{
+		case LN_1_PIN:
+			lane = LN_1;
+			init_timer_ln_1();
+			break;
+		case LN_2_PIN:
+			lane = LN_2;
+			init_timer_ln_2();
+			break;
+		default:
+			lane = 0;
+			break;
+	}
+	
+	DBG(this->p_serial, "PIR for lane %d Calibrating...", lane);
 	_delay_ms(30000);
+
+	initPIR();
 	DBG(this->p_serial, "PIR Constructor OK!\r\n");
+}
+
+void PIR::init_timer_ln_1 (void)
+{
+	// set up timer0 compA for lane 1
+	// Compare output mode, non-PWM mode, clear on compare match
+	TCCR0A |= ((1 << COM0A1) & ~(1 << COM0A0));
+	
+	// Force output compare A
+	TCCR0B |= (1 << FOC0A);
+	
+	// set prescaler to 1024
+	TCCR0B |= (((1 << CS02) & ~(1 << CS01)) | (1 << CS00));
+	
+	// Clear previous timer overflow
+	TIMSK0 |= (1 << OCF0A);
+	
+	// enable compare match
+	TIMSK0 |= (1 << OCIE0A);
+	
+	// set timer output compare match
+	OCR0A = 0xFF;
+}
+
+void PIR::init_timer_ln_2 (void)
+{
+	// set up timer0 compB for lane 2
+	// Compare output mode, non-PWM mode, clear on compare match
+	TCCR0A |= ((1 << COM0B1) & !(1 << COM0B0));
+	
+	// Force output compare B
+	TCCR0B |= (1 << FOC0B);
+	
+	// set prescaler to 1024
+	TCCR0B |= (((1 << CS02) & ~(1 << CS01)) | (1 << CS00));
+	
+	// Clear previous timer overflow
+	TIMSK0 |= (1 << OCF0B);
+	
+	// enable compare match
+	TIMSK0 |= (1 << OCIE0B);
+	
+	// set timer output compare match
+	OCR0A = 0xFF;
 }
 
 void PIR::initPIR (void)
 {
+	// Enable Pin Change Interrupts on Port D
 	PCICR |= 1 << PCIE2;
+	
+	// Enables Specific Pin as Pin Change Interrupt
 	PCMSK2 |= 1 << pin; // PCINTx
-	PCIFR = 1 << PCIF2;
+	
+	// Clear any previous interrupts
+	PCIFR |= 1 << PCIF2;
+	
 	sei();
 }
 
@@ -51,11 +114,7 @@ void PIR::initPIR (void)
  ****************************************************************************/
 bool PIR::isActive (void) 
 {
-	/*
-	DBG(this->p_serial, "PIR_PIN Reg: 0x%02X\r\n", PIR_PIN);
-	DBG(this->p_serial, "Pin location: %d\r\n", pin);
-	*/
-	return PIR_PIN & (1 << pin);
+	return lane_states & lane;
 }
 
 /*****************************************************************************
@@ -67,7 +126,7 @@ void PIR::PIRTask (void)
 	static uint8_t runs = 0;
 
 	// Runs once every 5 run cycles
-	if ((runs % 5) == 0)
+	if ((runs % 1) == 0)
 	{
 		DBG(this->p_serial, "\r\nPIR Task Running\r\n");
 
@@ -78,18 +137,7 @@ void PIR::PIRTask (void)
 		{
 			DBG(this->p_serial, "NOT ");
 		}
-		DBG(this->p_serial, "active.\r\n");
-		
-		/*
-		if (isActive())
-		{
-			DBG(this->p_serial, "1");
-		}
-		else
-		{
-			DBG(this->p_serial, "0");
-		}
-		*/
+		DBG(this->p_serial, "active.\r\n");		
 	}
 
 	runs++;
@@ -97,7 +145,7 @@ void PIR::PIRTask (void)
 
 ISR (PCINT2_vect)
 {
-	uint8_t changedBits;
+	changedBits;
 	cli();
 
 	changedBits = PIR_PIN ^ portd_hist;
@@ -106,15 +154,86 @@ ISR (PCINT2_vect)
 	if (changedBits & (1 << LN_1_PIN))
 	{
 		// Lane 1 changed state
-
+		// reset timer counter
+		ln_1_tmr_cnt = 0;
+		// set timer flag for lane 1
+		ln_tmr_flg |= LN_1;
+		
 		// clear timer
+		TIMSK0 |= (1 << OCF0A);
 	}
-	else if (changedBits & (1 << LN_2_PIN))
+	
+	if (changedBits & (1 << LN_2_PIN))
 	{
 		// Lane 2 changed state
-
+		// reset timer counter
+		ln_2_tmr_cnt = 0;
+		// set timer flag for lane 2
+		ln_tmr_flg |= LN_2;
+		
 		// clear timer
+		TIMSK0 |= (1 << OCF0B);
 	}
 
 	sei();
+}
+
+ISR (TIMER0_COMPA_vect)
+{	
+	// check if supposed to monitor for state hold
+	if (ln_tmr_flg & LN_1)
+	{
+		if (lane_states & LN_1)
+		{
+			// lane 1 was full
+			if (ln_1_tmr_cnt++ >= MIN_LN_EMPTY)
+			{
+				// lane 1 now considered empty
+				lane_states &= ~LN_1;
+				// clear the flag so stop monitoring
+				ln_tmr_flg &= ~LN_1;
+			}
+		}
+		else
+		{
+			// lane 1 was empty
+			if (ln_1_tmr_cnt++ >= MIN_LN_FULL)
+			{
+				// lane 1 now considered full
+				lane_states |= LN_1;
+				// clear the flag so stop monitoring
+				ln_tmr_flg &= ~LN_1;
+			}
+		}
+	}
+}
+
+ISR (TIMER0_COMPB_vect)
+{
+	// check if supposed to monitor for state hold
+	if (ln_tmr_flg & LN_2)
+	{
+		if (lane_states & LN_2)
+		{
+			// lane 2 was full
+			if (ln_2_tmr_cnt++ >= MIN_LN_EMPTY)
+			{
+				// lane 2 now considered empty
+				lane_states &= ~LN_2;
+				// clear the flag so stop monitoring
+				ln_tmr_flg &= ~LN_2;
+			}
+		}
+		else
+		{
+			// lane 2 was empty
+			if (ln_2_tmr_cnt++ >= MIN_LN_FULL)
+			{
+				// lane 2 now considered full
+				lane_states |= LN_2;
+				// clear the flag so stop monitoring
+				ln_tmr_flg &= ~LN_2;
+			}
+		}
+	}
 }

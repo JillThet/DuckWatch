@@ -12,12 +12,12 @@
 #include <util/delay.h>
 
 #define NO_ID				0
-#define ID_SURFACE_TEMP		1
-#define ID_UNDERWATER_TEMP	2
+#define ID_SURFACE_TEMP		2
+#define ID_UNDERWATER_TEMP	3
 
-#define DATA_DDR	DDRB
-#define DATA_PORT	PORTB
-#define DATA_PIN	PINB
+#define DATA_DDR	DDRD
+#define DATA_PORT	PORTD
+#define DATA_PIN	PIND
 
 /*****************************************************************************
  * Class:		oneWire

@@ -19,6 +19,14 @@
 /* initialize shared variables */
 char dbg_str[SERIAL_MAX_SEND];
 
+// PIR related globals
+volatile uint8_t lane_states = OPEN;
+volatile uint8_t ln_tmr_flg = 0x00;
+volatile uint8_t changedBits = 0x00;
+volatile uint8_t portd_hist = 0x00;
+volatile uint8_t ln_1_tmr_cnt = 0;
+volatile uint8_t ln_2_tmr_cnt = 0;
+
 int main(void)
 {
 	/* create serial object */
@@ -33,7 +41,7 @@ int main(void)
 	BME280 my_BME280 = BME280(&my_i2c, &ser_dev, 278);
 	
 	// create a water temperature sensor - surface
-	oneWire my_oneWire_surface_temp = oneWire(&ser_dev, 0, ID_SURFACE_TEMP);
+	oneWire my_oneWire_surface_temp = oneWire(&ser_dev, 3, ID_SURFACE_TEMP);
 	
 	// create a tilt-ball object
 	TiltBall my_TiltBall = TiltBall(&ser_dev, 0);
