@@ -15,7 +15,9 @@ extern char dbg_str[];
 #define BYTE_SHIFT	8
 
 // Globally shared variables for PIR
-extern uint8_t lane_states;
+extern volatile uint8_t lane_states;
+extern volatile	uint8_t ln_tmr_flg;
+extern volatile uint8_t changedBits;
 extern volatile uint8_t portd_hist;
 extern volatile uint8_t ln_1_tmr_cnt;
 extern volatile uint8_t ln_2_tmr_cnt;

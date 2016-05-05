@@ -21,8 +21,16 @@
 #define PIR_PORT 	PORTD
 #define PIR_PIN 	PIND
 
-#define LN_1_PIN	5
-#define LN_2_PIN	6	
+#define LN_1_PIN	7
+#define LN_2_PIN	4	
+
+#define OPEN	0x00
+#define LN_1	0x01
+#define LN_2	0x02
+
+// TODO - change these as necessary
+#define MIN_LN_EMPTY	155
+#define MIN_LN_FULL		100
 
 /*****************************************************************************
  * Class:		PIR
@@ -40,13 +48,25 @@ class PIR
 
 		// PIR data out pin
 		uint8_t pin;
-
+		
+		// Lane Identifier
+		uint8_t lane;
+		
+		// this method sets up the timer for lane 1
+		void init_timer_ln_1 (void);
+		
+		// this method sets up the timer for lane 2
+		void init_timer_ln_2 (void);
+		
 	public:
 		// No public class variables
 
 		// this constructor sets up the PIR for use
 		PIR (serial *ptr_serial, uint8_t p);
 
+		// this method sets up the PIR for use
+		void initPIR (void);
+		
 		// this method runs the PIR task
 		void PIRTask (void);
 
