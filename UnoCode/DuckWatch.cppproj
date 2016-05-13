@@ -153,6 +153,12 @@
     <Compile Include="i2c.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="LCD.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="LCD.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="main.cpp">
       <SubType>compile</SubType>
     </Compile>

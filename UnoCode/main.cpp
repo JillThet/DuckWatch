@@ -14,6 +14,7 @@
 #include "oneWire.h"
 #include "UVIndex.h"
 #include "PIR.h"
+#include "LCD.h"
 #include "shares.h"		// extern for global shared variables
 
 /* initialize shared variables */
@@ -51,6 +52,9 @@ int main(void)
 	
 	// create a PIR sensor 
 	PIR my_pir_ln1 = PIR(&ser_dev, LN_1_PIN);
+	
+	// create LCD object
+	LCD my_lcd = LCD();
 	
 	DBG(&ser_dev, "All Sensors created!\r\n");
 	

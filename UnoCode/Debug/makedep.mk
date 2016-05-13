@@ -6,6 +6,8 @@ BME280.cpp
 
 i2c.cpp
 
+LCD.cpp
+
 main.cpp
 
 oneWire.cpp

@@ -39,6 +39,7 @@ SUBDIRS :=
 C_SRCS +=  \
 ../BME280.cpp \
 ../i2c.cpp \
+../LCD.cpp \
 ../main.cpp \
 ../oneWire.cpp \
 ../PIR.cpp \
@@ -56,6 +57,7 @@ ASM_SRCS +=
 OBJS +=  \
 BME280.o \
 i2c.o \
+LCD.o \
 main.o \
 oneWire.o \
 PIR.o \
@@ -66,6 +68,7 @@ UVIndex.o
 OBJS_AS_ARGS +=  \
 BME280.o \
 i2c.o \
+LCD.o \
 main.o \
 oneWire.o \
 PIR.o \
@@ -76,6 +79,7 @@ UVIndex.o
 C_DEPS +=  \
 BME280.d \
 i2c.d \
+LCD.d \
 main.d \
 oneWire.d \
 PIR.d \
@@ -86,6 +90,7 @@ UVIndex.d
 C_DEPS_AS_ARGS +=  \
 BME280.d \
 i2c.d \
+LCD.d \
 main.d \
 oneWire.d \
 PIR.d \
@@ -107,6 +112,8 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
 
 
 
