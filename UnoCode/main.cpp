@@ -28,7 +28,13 @@ volatile uint8_t portd_hist = 0x00;
 volatile uint8_t ln_1_tmr_cnt = 0;
 volatile uint8_t ln_2_tmr_cnt = 0;
 
-// global variables
+// Shared Variables for Sensor Values
+int32_t surf_temp;
+int32_t sub_temp;
+int32_t ext_tep;
+uint32_t humidity;
+uint8_t windy;
+int16_t uv_ndx;
 
 
 int main(void)
@@ -47,14 +53,20 @@ int main(void)
 	// create a water temperature sensor - surface
 	oneWire my_oneWire_surface_temp = oneWire(&ser_dev, 3, ID_SURFACE_TEMP);
 	
+	// create a water temperature sensor - surface
+	oneWire my_oneWire_underwater_temp = oneWire(&ser_dev, 3, ID_UNDERWATER_TEMP);
+	
 	// create a tilt-ball object
 	TiltBall my_TiltBall = TiltBall(&ser_dev, 0);
 	
 	// create a UVIndex sensor
 	UVIndex my_UVIndex = UVIndex(&ser_dev, 7);
 	
-	// create a PIR sensor 
+	// create a PIR sensor for lane 1
 	PIR my_pir_ln1 = PIR(&ser_dev, LN_1_PIN);
+	
+	// create a PIR sensor for lane 2
+	PIR my_pir_ln2 = PIR(&ser_dev, LN_2_PIN);
 	
 	// create LCD object
 	LCD my_lcd = LCD();
@@ -68,11 +80,15 @@ int main(void)
 		
 		my_oneWire_surface_temp.oneWireTask();
 		
+		my_oneWire_underwater_temp.oneWireTask();
+		
 		my_TiltBall.TiltBallTask();
 				
 		my_UVIndex.UVIndexTask();
 		
 		my_pir_ln1.PIRTask();
+		
+		my_pir_ln2.PIRTask();
 		
 		_delay_ms(1000);
     }
