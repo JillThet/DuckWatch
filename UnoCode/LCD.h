@@ -88,30 +88,36 @@ class LCD{
 		uint8_t pagemap[8];
 		
 		uint8_t buff[BUF_SIZE];
+		char[20] surfStr;
+		char[20] subStr;
+		char[20] extStr;
+		char[20] humStr;
+		char[20] winStr;
+		char[20] uvStr;
 		
 		// this method draws a single pixel on the LCD
-		void setpixel(/*uint8_t *buff,*/ uint8_t col, uint8_t row, uint8_t fill);
+		void setpixel(uint8_t col, uint8_t row, uint8_t fill);
 
 		// this method draws an empty rectangle on the LCD
-		void drawrect(/*uint8_t *buff,*/ uint8_t col, uint8_t row, uint8_t width,
+		void drawrect(uint8_t col, uint8_t row, uint8_t width,
 			uint8_t height, uint8_t fill);
 
 		// this method draws a line of pixels on the LCD
-		void drawline(/*uint8_t *buff,*/ uint8_t col0, uint8_t row0, uint8_t col1, 
+		void drawline(uint8_t col0, uint8_t row0, uint8_t col1, 
 			uint8_t row1, uint8_t fill);
 
 		// this method draws a character on the LCD
-		void drawchar(/*uint8_t *buff,*/ uint8_t col, uint8_t row, uint8_t data);
+		void drawchar(uint8_t col, uint8_t row, uint8_t data);
 
 		// this method draws a filled rectangle on the LCD
-		void fillrect(/*uint8_t *buff,*/ uint8_t col, uint8_t row, uint8_t width, 
+		void fillrect(uint8_t col, uint8_t row, uint8_t width, 
 			uint8_t height, uint8_t fill);
 
 		// this method draws a string of characters on the LCD
-		void drawstring(/*uint8_t *buff,*/ uint8_t col, uint8_t row, uint8_t *str);
+		void drawstring(uint8_t col, uint8_t row, uint8_t *str);
 
 		// this method clears the buffer
-		void clear_buffer(/*uint8_t *buffer*/);
+		void clear_buffer();
 
 		// this method initializes the SPI interface
 		void spi_init(void);
@@ -138,7 +144,7 @@ class LCD{
 		//void clear_screen(void);
 
 		// this method writes the LCD buffer to the LCD
-		void write_buffer(/*uint8_t *buffer*/);
+		void write_buffer();
 
 	public:
 		LCD (void);

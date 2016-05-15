@@ -291,13 +291,46 @@ LCD::LCD (void)
 	EICRA = 0x03;
 	EIMSK = 0x01;
 	EIFR = 0x01;
+
+	sprintf(surfStr, "Surf:%02d.%02d", surf_temp / 100, surf_temp % 100);
+	sprintf(subStr, "Sub:%02d.%02d", sub_temp / 100, sub_temp % 100);
+	sprintf(extStr, "Ext:%02d.%02d", ext_temp / 100, ext_temp % 100);
+	sprintf(humStr, "Hum:%02d.%02d", humidity / 1024, humidity % 1024);
+	
+	if(windy)
+	{
+		sprintf(winStr, "W:Y");
+	}
+	else
+	{
+		sprintf(winStr, "W:N");
+	}
+	
+	sprintf(uvStr, "UV:%01d.%02d", uv_ndx / 100, uv_ndx % 100);
+
+	drawstring(0, 0, "Duck Pond");
+	drawstring(0, 1, surfStr);
+	drawstring(0, 2, subStr);
+	drawstring(0, 3, extStr);
+	drawstring(0, 4, humStr);
+	drawstring(11, 1, winStr);
+	drawstring(11, 3, uvStr);
+
+	drawstring(0, 6, "LN1");
+
+	drawrect(17, 48, 60, 7);
+
+	drawstring(0, 7, "LN2");
+
+	drawrect(17, 55, 60, 7);
 }
 
 /*****************************************************************************
  * Method:		setup_lcd
  * Description:	This method sets up the LCD to display output
  ****************************************************************************/
-void LCD::setup_lcd(void){
+void LCD::setup_lcd(void)
+{
 	lcd_init();
 
 	lcd_command(CMD_DISPLAY_ON);
@@ -311,7 +344,8 @@ void LCD::setup_lcd(void){
  * Method:		lcd_init
  * Description:	This method initializes the LCD for proper functionality
  ****************************************************************************/
-void LCD::lcd_init(void){
+void LCD::lcd_init(void)
+{
 	// toggle RST low to reset; SS low so LCD will listen
 	PORTB &= ~(1 << SS);
 	PORTC &= ~(1 << RST);
@@ -353,7 +387,8 @@ void LCD::lcd_init(void){
  * Description:	This method initializes the SPI Protocol using the appropriate
  *				registers
  ****************************************************************************/
-void LCD::spi_init(void){
+void LCD::spi_init(void)
+{
 	SPCR = (1 << SPE) | (1 << MSTR);
 	PORTB = (1 << SS);						// make sure SS is high
 }
@@ -364,7 +399,8 @@ void LCD::spi_init(void){
  * 
  * Parameters:	data - data to write using the SPI protocol
  ****************************************************************************/
-inline void LCD::spiwrite(uint8_t data) {
+inline void LCD::spiwrite(uint8_t data) 
+{
 	PORTB &= ~(1 << SS);
 	SPDR = data;
 	while (!(SPSR & (1<<SPIF)));
@@ -377,7 +413,8 @@ inline void LCD::spiwrite(uint8_t data) {
  * 
  * Parameters:	data - the command to be executed
  ****************************************************************************/
-void LCD::lcd_command(uint8_t data) {
+void LCD::lcd_command(uint8_t data) 
+{
 	PORTC &= ~(1 << A0);
 
 	spiwrite(data);
@@ -389,7 +426,8 @@ void LCD::lcd_command(uint8_t data) {
  * 
  * Parameters:	val - the new bightness value of the LCD
  ****************************************************************************/
-void LCD::lcd_set_brightness(uint8_t val) {
+void LCD::lcd_set_brightness(uint8_t val) 
+{
 	lcd_command(CMD_SET_VOLUME_FIRST);
 	lcd_command(CMD_SET_VOLUME_SECOND | (val & 0x3f));
 }
@@ -400,7 +438,8 @@ void LCD::lcd_set_brightness(uint8_t val) {
  * 
  * Parameters:	data - the data being sent to the LCD
  ****************************************************************************/
-void LCD::lcd_data(uint8_t data) {
+void LCD::lcd_data(uint8_t data) 
+{
 	PORTC |= (1 << A0);
 
 	spiwrite(data);
@@ -410,10 +449,12 @@ void LCD::lcd_data(uint8_t data) {
  * Method:		write_buffer
  * Description:	This method writes the buffer to the LCD
  ****************************************************************************/
-void LCD::write_buffer(/*uint8_t *buffer*/) {
+void LCD::write_buffer() 
+{
 	uint8_t data, page;
 
-	for(page = 0; page < 8; page++) {
+	for(page = 0; page < 8; page++) 
+	{
 
 		lcd_command(CMD_SET_PAGE | pagemap[page]);
 		lcd_command(CMD_SET_COLUMN_LOWER | (0x0 & 0xf));
@@ -421,7 +462,8 @@ void LCD::write_buffer(/*uint8_t *buffer*/) {
 		lcd_command(CMD_RMW);
 		lcd_data(0xff);
 		
-		for(data = 0; data < 128; data++) {
+		for(data = 0; data < 128; data++) 
+		{
 			lcd_data(buff[(128*page)+data]);
 		}
 	}
@@ -435,7 +477,8 @@ void LCD::write_buffer(/*uint8_t *buffer*/) {
  *				row 	- the row the pixel is in
  *				fill 	- the fill value of the pixel, 1 = black, 0 = clear
  ****************************************************************************/
-void LCD::setpixel(uint8_t col, uint8_t row, uint8_t fill) {
+void LCD::setpixel(uint8_t col, uint8_t row, uint8_t fill) 
+{
   	if ((col >= LCDWIDTH) || (row >= LCDHEIGHT))
   	{
     	return;
@@ -459,14 +502,16 @@ void LCD::setpixel(uint8_t col, uint8_t row, uint8_t fill) {
  *				row 	- the row the string starts at
  *				*str 	- the string to be sent to the LCD
  ****************************************************************************/
-void LCD::drawstring(uint8_t col, uint8_t row, uint8_t *str){
-	while (str[0] != 0) {
-    
+void LCD::drawstring(uint8_t col, uint8_t row, uint8_t *str)
+{
+	while (str[0] != 0) 
+	{
 	    drawchar(col, row, str[0]);
 	    str++;
 	    col += 6; // 6 pixels wide
 	    
-	    if (col + 6 >= LCDWIDTH) {
+	    if (col + 6 >= LCDWIDTH) 
+	    {
 	      col = 0;    // ran out of this line
 	      row++;
 	    }
@@ -486,10 +531,12 @@ void LCD::drawstring(uint8_t col, uint8_t row, uint8_t *str){
  *				row 	- the row the character is at
  *				data 	- the character to be sent to the LCD
  ****************************************************************************/
-void LCD::drawchar(/*uint8_t *buff,*/ uint8_t col, uint8_t row, uint8_t data) {
+void LCD::drawchar(uint8_t col, uint8_t row, uint8_t data) 
+{
   	uint8_t i;
 
-  	for (i =0; i<5; i++ ) {
+  	for (i =0; i<5; i++ ) 
+  	{
     	buff[col + (row*128) ] = pgm_read_byte(font+(data*5)+i);
     	col++;
   	}
@@ -506,18 +553,20 @@ void LCD::drawchar(/*uint8_t *buff,*/ uint8_t col, uint8_t row, uint8_t data) {
  *				row1 - the row the line ends at
  *				fill - the fill value of the pixel, 1 = black, 0 = clear
  ****************************************************************************/
-void LCD::drawline(/*uint8_t *buff,*/ uint8_t col0, uint8_t row0, 
-              uint8_t col1, uint8_t row1, uint8_t fill) {
-
+void LCD::drawline(uint8_t col0, uint8_t row0, 
+              uint8_t col1, uint8_t row1, uint8_t fill) 
+{
   uint8_t dx, dy, err, rowStep;
   uint8_t steep = abs(row1 - row0) > abs(col1 - col0);
   
-  if (steep) {
+  if (steep) 
+  {
     swap(col0, row0);
     swap(col1, row1);
   }
 
-  if (col0 > col1) {
+  if (col0 > col1) 
+  {
     swap(col0, col1);
     swap(row0, row1);
   }
@@ -527,20 +576,29 @@ void LCD::drawline(/*uint8_t *buff,*/ uint8_t col0, uint8_t row0,
 
   err = dx / 2;
 
-  if (row0 < row1) {
+  if (row0 < row1) 
+  {
     rowStep = 1;
-  } else {
-    rowStep = -1;}
+  } 
+  else 
+  {
+    rowStep = -1;
+  }
 
-  for (; col0 < col1; col0++) {
-    if (steep) {
+  for (; col0 < col1; col0++) 
+  {
+    if (steep) 
+    {
       setpixel(row0, col0, fill);
-    } else {
+    } 
+    else 
+    {
       setpixel(col0, row0, fill);
     }
     err -= dy;
 	
-    if (err < 0) {
+    if (err < 0) 
+    {
       row0 += rowStep;
       err += dx;
     }
@@ -560,13 +618,14 @@ void LCD::drawline(/*uint8_t *buff,*/ uint8_t col0, uint8_t row0,
  *				fill 	- the fill value of the pixel, 1 = black, 0 = clear
  ****************************************************************************/
 void LCD::fillrect(uint8_t col, uint8_t row, uint8_t width, 
-	uint8_t height, uint8_t fill) {
-  uint8_t colNdx;
+	uint8_t height, uint8_t fill) 
+{
+	uint8_t colNdx;
 
-  for (colNdx = col; colNdx < (col + width); colNdx++)
-  {
-	  drawline(colNdx, row, colNdx, row + height, fill);
-  }
+	for (colNdx = col; colNdx < (col + width); colNdx++)
+	{
+		drawline(colNdx, row, colNdx, row + height, fill);
+	}
 }
 
 /*****************************************************************************
@@ -582,12 +641,12 @@ void LCD::fillrect(uint8_t col, uint8_t row, uint8_t width,
  *				fill 	- the fill value of the pixel, 1 = black, 0 = clear
  ****************************************************************************/
 void LCD::drawrect(uint8_t col, uint8_t row, uint8_t width, 
-	uint8_t height, uint8_t fill) {
-				  
-  drawline(col, row, col + width, row, fill);
-  drawline(col + width, row, col + width, row + height, fill);
-  drawline(col, row, col, row + height, fill);
-  drawline(col, row + height, col + width, row + height, fill);		  
+	uint8_t height, uint8_t fill) 
+{				  
+	drawline(col, row, col + width, row, fill);
+	drawline(col + width, row, col + width, row + height, fill);
+	drawline(col, row, col, row + height, fill);
+	drawline(col, row + height, col + width, row + height, fill);		  
 }
 
 /*****************************************************************************
@@ -598,26 +657,39 @@ void LCD::clear_buffer(void) {
   memset(buff, 0, 1024);
 }
 
-/*void clear_screen(void) {
-	uint8_t page, data;
+void LCD::LCDTask()
+{
+	clear_buffer();
+
+	sprintf(surfStr, "Surf:%02d.%02d", surf_temp / 100, surf_temp % 100);
+	sprintf(subStr, "Sub:%02d.%02d", sub_temp / 100, sub_temp % 100);
+	sprintf(extStr, "Ext:%02d.%02d", ext_temp / 100, ext_temp % 100);
+	sprintf(humStr, "Hum:%02d.%02d", humidity / 1024, humidity % 1024);
 	
-	for(page = 0; page < 8; page++) {
-
-		lcd_command(CMD_SET_PAGE | page);
-		for(data = 0; data < 129; data++) {
-			lcd_command(CMD_SET_COLUMN_LOWER | (data & 0xf));
-			lcd_command(CMD_SET_COLUMN_UPPER | ((data >> 4) & 0xf));
-			lcd_data(0x0);
-		}
+	if(windy)
+	{
+		sprintf(winStr, "W:Y");
 	}
-}*/
+	else
+	{
+		sprintf(winStr, "W:N");
+	}
+	
+	sprintf(uvStr, "UV:%01d.%02d", uv_ndx / 100, uv_ndx % 100);
 
+	drawstring(0, 0, "Duck Pond");
+	drawstring(0, 1, surfStr);
+	drawstring(0, 2, subStr);
+	drawstring(0, 3, extStr);
+	drawstring(0, 4, humStr);
+	drawstring(11, 1, winStr);
+	drawstring(11, 3, uvStr);
 
+	drawstring(0, 6, "LN1");
 
+	drawrect(17, 48, 60, 7);
 
+	drawstring(0, 7, "LN2");
 
-
-
-
-
-
+	drawrect(17, 55, 60, 7);
+}
