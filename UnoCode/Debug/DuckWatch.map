@@ -1168,29 +1168,29 @@ END GROUP
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000     0x53f9
+.debug_info     0x00000000     0x542c
  *(.debug_info .gnu.linkonce.wi.*)
  .debug_info    0x00000000      0xe73 BME280.o
  .debug_info    0x00000e73      0x8af i2c.o
  .debug_info    0x00001722      0xf05 LCD.o
- .debug_info    0x00002627     0x1238 main.o
- .debug_info    0x0000385f      0x8f1 oneWire.o
- .debug_info    0x00004150      0x5e8 PIR.o
- .debug_info    0x00004738      0x385 serial.o
- .debug_info    0x00004abd      0x356 TiltBall.o
- .debug_info    0x00004e13      0x5e6 UVIndex.o
+ .debug_info    0x00002627     0x126b main.o
+ .debug_info    0x00003892      0x8f1 oneWire.o
+ .debug_info    0x00004183      0x5e8 PIR.o
+ .debug_info    0x0000476b      0x385 serial.o
+ .debug_info    0x00004af0      0x356 TiltBall.o
+ .debug_info    0x00004e46      0x5e6 UVIndex.o
 
-.debug_abbrev   0x00000000     0x1949
+.debug_abbrev   0x00000000     0x1962
  *(.debug_abbrev)
  .debug_abbrev  0x00000000      0x38d BME280.o
  .debug_abbrev  0x0000038d      0x324 i2c.o
  .debug_abbrev  0x000006b1      0x2f1 LCD.o
- .debug_abbrev  0x000009a2      0x32f main.o
- .debug_abbrev  0x00000cd1      0x319 oneWire.o
- .debug_abbrev  0x00000fea      0x2cc PIR.o
- .debug_abbrev  0x000012b6      0x200 serial.o
- .debug_abbrev  0x000014b6      0x1ff TiltBall.o
- .debug_abbrev  0x000016b5      0x294 UVIndex.o
+ .debug_abbrev  0x000009a2      0x348 main.o
+ .debug_abbrev  0x00000cea      0x319 oneWire.o
+ .debug_abbrev  0x00001003      0x2cc PIR.o
+ .debug_abbrev  0x000012cf      0x200 serial.o
+ .debug_abbrev  0x000014cf      0x1ff TiltBall.o
+ .debug_abbrev  0x000016ce      0x294 UVIndex.o
 
 .debug_line     0x00000000     0x1132
  *(.debug_line .debug_line.* .debug_line_end)
@@ -1216,26 +1216,26 @@ END GROUP
  .debug_frame   0x00000a74       0x5c TiltBall.o
  .debug_frame   0x00000ad0       0xb4 UVIndex.o
 
-.debug_str      0x00000000      0xee6
+.debug_str      0x00000000      0xebb
  *(.debug_str)
- .debug_str     0x00000000      0x733 BME280.o
-                                0x7e0 (size before relaxing)
- .debug_str     0x00000733       0x45 i2c.o
-                                0x3a8 (size before relaxing)
- .debug_str     0x00000778      0x2fc LCD.o
+ .debug_str     0x00000000      0x731 BME280.o
+                                0x7de (size before relaxing)
+ .debug_str     0x00000731       0x45 i2c.o
+                                0x3a6 (size before relaxing)
+ .debug_str     0x00000776      0x2c0 LCD.o
                                 0x476 (size before relaxing)
- .debug_str     0x00000a74      0x328 main.o
-                                0xcce (size before relaxing)
- .debug_str     0x00000d9c       0x7d oneWire.o
-                                0x44f (size before relaxing)
- .debug_str     0x00000e19       0x44 PIR.o
-                                0x3f1 (size before relaxing)
- .debug_str     0x00000e5d       0x2f serial.o
+ .debug_str     0x00000a36      0x33b main.o
+                                0xce1 (size before relaxing)
+ .debug_str     0x00000d71       0x7d oneWire.o
+                                0x44d (size before relaxing)
+ .debug_str     0x00000dee       0x44 PIR.o
+                                0x3ef (size before relaxing)
+ .debug_str     0x00000e32       0x2f serial.o
                                 0x281 (size before relaxing)
- .debug_str     0x00000e8c       0x2b TiltBall.o
-                                0x2ef (size before relaxing)
- .debug_str     0x00000eb7       0x2f UVIndex.o
-                                0x39f (size before relaxing)
+ .debug_str     0x00000e61       0x2b TiltBall.o
+                                0x2ed (size before relaxing)
+ .debug_str     0x00000e8c       0x2f UVIndex.o
+                                0x39d (size before relaxing)
 
 .debug_loc      0x00000000     0x3349
  *(.debug_loc)

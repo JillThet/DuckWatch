@@ -28,6 +28,9 @@ volatile uint8_t portd_hist = 0x00;
 volatile uint8_t ln_1_tmr_cnt = 0;
 volatile uint8_t ln_2_tmr_cnt = 0;
 
+// global variables
+
+
 int main(void)
 {
 	/* create serial object */
