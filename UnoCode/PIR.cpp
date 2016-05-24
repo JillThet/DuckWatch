@@ -145,7 +145,6 @@ void PIR::PIRTask (void)
 
 ISR (PCINT2_vect)
 {
-	changedBits;
 	cli();
 
 	changedBits = PIR_PIN ^ portd_hist;
@@ -180,6 +179,7 @@ ISR (PCINT2_vect)
 
 ISR (TIMER0_COMPA_vect)
 {	
+	cli();
 	// check if supposed to monitor for state hold
 	if (ln_tmr_flg & LN_1)
 	{
@@ -206,10 +206,12 @@ ISR (TIMER0_COMPA_vect)
 			}
 		}
 	}
+	sei();
 }
 
 ISR (TIMER0_COMPB_vect)
 {
+	cli();
 	// check if supposed to monitor for state hold
 	if (ln_tmr_flg & LN_2)
 	{
@@ -236,4 +238,5 @@ ISR (TIMER0_COMPB_vect)
 			}
 		}
 	}
+	sei();
 }
