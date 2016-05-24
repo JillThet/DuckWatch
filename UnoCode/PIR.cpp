@@ -21,7 +21,6 @@ PIR::PIR (serial *ptr_serial, uint8_t p)
 	pin = p;
 	p_serial = ptr_serial;
 
-
 	// Make PIR an Input
 	INPUT(PIR_DDR, pin);
 	
@@ -40,11 +39,11 @@ PIR::PIR (serial *ptr_serial, uint8_t p)
 			break;
 	}
 	
-	DBG(this->p_serial, "PIR for lane %d Calibrating...", lane);
+	//DBG(this->p_serial, "PIR for lane %d Calibrating...", lane);
 	_delay_ms(30000);
 
 	initPIR();
-	DBG(this->p_serial, "PIR Constructor OK!\r\n");
+	//DBG(this->p_serial, "PIR Constructor OK!\r\n");
 }
 
 void PIR::init_timer_ln_1 (void)
@@ -124,13 +123,16 @@ bool PIR::isActive (void)
 void PIR::PIRTask (void)
 {
 	static uint8_t runs = 0;
-
+	
+	// TODO - What does this task actually do now?
+	
+	/*
 	// Runs once every 5 run cycles
 	if ((runs % 1) == 0)
 	{
 		DBG(this->p_serial, "\r\nPIR Task Running\r\n");
 
-		DBG(this->p_serial, "Sensor is ");
+		DBG(this->p_serial, "Sensor (%d) is ", lane);
 
 		// check for sensor active
 		if (!isActive())
@@ -139,7 +141,7 @@ void PIR::PIRTask (void)
 		}
 		DBG(this->p_serial, "active.\r\n");		
 	}
-
+	*/
 	runs++;
 }
 

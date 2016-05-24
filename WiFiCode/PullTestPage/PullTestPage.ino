@@ -17,7 +17,7 @@ const int httpsPort = 443;
 
 void setup() {
   // put your setup code here, to run once:
-  Serial.begin(115200);
+  Serial.begin(9600);
   Serial.println();
   Serial.print("connecting to ");
   Serial.println(ssid);

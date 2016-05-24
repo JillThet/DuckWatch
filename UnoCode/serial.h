@@ -19,6 +19,8 @@
 
 #define SERIAL_MAX_SEND	255
 
+#define PKT_SIZE 50
+
 /*****************************************************************************
  * Class:		serial
  * Description:	The serial class enables the microcontroller to communicate 
@@ -30,7 +32,7 @@ class serial
 		// no protected methods or variables
 		
 	private:
-		uint16_t baud_rate;		// the baud rate for serial connection
+		uint32_t baud_rate;		// the baud rate for serial connection
 		uint32_t clk_speed;		// the clock speed of the microcontroller
 		
 		// this method initializes the USART Connection
@@ -41,7 +43,7 @@ class serial
 	
 	public:
 		// this is the constructor to set up the serial connection
-		serial (uint16_t baud, uint32_t clk);
+		serial (uint32_t baud, uint32_t clk);
 		
 		// this method sends a string of data over the TX line
 		uint8_t send (char *str);
@@ -51,6 +53,9 @@ class serial
 		
 		// this method checks if there is data available on the RX line
 		bool data_available (void);
+		
+		// this method sends a packet with all of the sensor values
+		void sendPkt (void);
 	
 };
 #endif /* __SERIAL_H__ */

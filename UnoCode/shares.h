@@ -25,8 +25,8 @@ extern volatile uint8_t ln_2_tmr_cnt;
 // Shared Variables for Sensor Values
 extern int32_t surf_temp;
 extern int32_t sub_temp;
-extern int32_t ext_tep;
-extern uint32_t humidity;
+extern int32_t ext_temp;
+extern uint32_t ext_hum;
 extern uint8_t windy;
 extern int16_t uv_ndx;
 
@@ -58,6 +58,9 @@ extern int16_t uv_ndx;
 								(ser)->send((char*)dbg_str);			\
 							}
 
+/****************************************************************************
+#define DBG(ser, fmt, ... ) 
+****************************************************************************/
 /*****************************************************************************
  * MACRO:		TEMP_C_TO_F
  * Description:	Converts a temperature in C to its equivalent in F.

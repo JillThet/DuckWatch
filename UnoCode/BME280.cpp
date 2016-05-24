@@ -28,32 +28,32 @@ BME280::BME280 (i2c* ptr_i2c, serial *ptr_serial, int32_t temperature_cal)
 	
 	if (p_i2c->ping(BME280_ADDR))
 	{
-		DBG(this->p_serial, "BME280 <0x%X> ALIVE\r\n", BME280_ADDR);
+		//DBG(this->p_serial, "BME280 <0x%X> ALIVE\r\n", BME280_ADDR);
 	}
 	else
 	{
-		DBG(this->p_serial, "BME280 <0x%X> DEAD\r\n", BME280_ADDR);
+		//DBG(this->p_serial, "BME280 <0x%X> DEAD\r\n", BME280_ADDR);
 		return;
 	}
 
 	// initialize the sensor registers
 	if(init())
 	{
-		DBG(this->p_serial, "BME280::BME280 FAILED BME280::init\r\n");
+		//DBG(this->p_serial, "BME280::BME280 FAILED BME280::init\r\n");
 		return;
 	}
 	
 	// read out cal registers for calculations
 	if (read_cal())
 	{
-		DBG(this->p_serial, "BME280::BME280 FAILED BME280::read_cal\r\n");
+		//DBG(this->p_serial, "BME280::BME280 FAILED BME280::read_cal\r\n");
 		return;
 	}
 	
 	// initial read of data to fill sensor data
 	read_data();
 	
-	DBG(this->p_serial, "BME280 Constructor OK!\r\n");
+	//DBG(this->p_serial, "BME280 Constructor OK!\r\n");
 }
 
 /*****************************************************************************
@@ -103,8 +103,8 @@ bool BME280::set_mode (op_Mode mode)
 	if (p_i2c->write(BME280_ADDR, BME280_CTRL_HUM, ctrl_hum))
     {
 		// There was a problem overwriting the humidity 
-		DBG(this->p_serial,
-			"BME280::set_mode - FAILED overwriting humidity.\r\n");
+		//DBG(this->p_serial,
+		//	"BME280::set_mode - FAILED overwriting humidity.\r\n");
 		return true;
 	}
 	
@@ -172,7 +172,7 @@ int32_t BME280::convert_pressure (void)
 }
 
 /*****************************************************************************
- * Method:		conver_temperature
+ * Method:		convert_temperature
  * Description:	This method converts the raw temperature data into a 
  *				human-readable format. The formulas used for converting the
  *				raw values to the human-readable format are derived from the
@@ -273,7 +273,7 @@ bool BME280::read_data (void)
 	if (p_i2c->read(BME280_ADDR, BME280_P_RAW_MSB, data, NUM_DATA_REG))
 	{
 		// There was an error in the read operation, propagate this message
-		DBG(this->p_serial, "BME280::read_data FAILED to read data registers\r\n");
+		//DBG(this->p_serial, "BME280::read_data FAILED to read data registers\r\n");
 		return true;
 	}
 	
@@ -321,7 +321,7 @@ bool BME280::read_cal (void)
 	 || p_i2c->read(BME280_ADDR, BME280_CAL_START_2, data2, BME280_CAL_RNG_2))
 	{
 		// There was an error in the read operation, propagate this message
-		DBG(this->p_serial, "BME280::read_cal FAILED to read cal reigsters\r\n");
+		//DBG(this->p_serial, "BME280::read_cal FAILED to read cal reigsters\r\n");
 		return true;
 	}
 	
@@ -370,6 +370,14 @@ void BME280::BME280Task (void)
 	static uint8_t runs = 0;
 	int32_t temp_f;
 	
+	read_data();
+	temp_f = TEMP_C_TO_F(temperature);
+	
+	// update global values to be used to send packet
+	ext_hum = humidity;
+	ext_temp = temp_f;
+	
+	/*
 	if ((runs % 5) == 0)
 	{
 		DBG(this->p_serial, "\r\nBME280 Task Running\r\n");
@@ -388,7 +396,7 @@ void BME280::BME280Task (void)
 		DBG(this->p_serial, "Pressure: %luPa\r\n",
 			pressure);
 	}
-	
+	*/
 	runs++;
 	return;
 }

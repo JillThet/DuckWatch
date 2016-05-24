@@ -7,6 +7,7 @@
  ****************************************************************************/
 #include "serial.h"		// header for this file
 #include "shares.h"		// extern globally shared variables
+#include "PIR.h"		// header that contains lane masks for lane states
 
 /*****************************************************************************
  * Method:		serial
@@ -16,7 +17,7 @@
  * Parameters:	baud - the baud rate to establish
  *				clk  - the clock speed of the device
  ****************************************************************************/
-serial::serial (uint16_t baud, uint32_t clk)
+serial::serial (uint32_t baud, uint32_t clk)
 {
 	baud_rate = baud;		// store a local copy of baud rate
 	clk_speed = clk;		// store a local copy of clock speed of device
@@ -145,4 +146,33 @@ uint8_t serial::receive (void)
 bool serial::data_available (void)
 {
 	return (UCSR0A & (1 << RXC0));
+}
+
+
+/*****************************************************************************
+ * Method:		sendPkt
+ * Description:	This method sends a packet over the TX line that contains all
+ *				of the latest sensor data.
+ ****************************************************************************/
+void serial::sendPkt (void)
+{
+	char pkt[PKT_SIZE];
+	
+	// disable interrupts so data does not change
+	//cli();
+	
+	sprintf(pkt, "<[=%ld,%ld,%ld,%lu,%d,%d,%d,%d=]>\r\n",
+		surf_temp,
+		sub_temp,
+		ext_temp,
+		ext_hum,
+		windy,
+		uv_ndx,
+		(lane_states & 0x01) ? 1 : 0,
+		(lane_states & 0x02) ? 1 : 0);
+	
+	send(pkt);
+	
+	// re-enable interrupts for PIR and timers
+	//sei();
 }

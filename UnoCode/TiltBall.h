@@ -32,8 +32,11 @@ class TiltBall
 		// pointer to serial object for debugging
 		serial *p_serial;
 
-		// pin on port D which connects the TiltBall to the microcontroller
+		// pin on port B which connects the TiltBall to the microcontroller
 		uint8_t pin;
+		
+		// Tilt history
+		uint32_t hist;
 	
 	public:
 		// No public class variables
@@ -43,6 +46,8 @@ class TiltBall
 
 		// this method checks if the sensor is tilted
 		bool isTilted (void);
+		
+		uint8_t isWindy(void);
 
 		// this method runs once every time the main loop runs
 		void TiltBallTask (void);

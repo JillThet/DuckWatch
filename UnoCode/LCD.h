@@ -75,25 +75,26 @@
 #define SS						2  // PB pin 2  
 
 // LCD Controls Constants
-#define A0						2
-#define RST						3
+#define A0						1
+#define RST						2
 
 /****************************************************************************/
 // Macros
 /****************************************************************************/
 #define swap(a, b) { uint8_t t = a; a = b; b = t; }
 
-class LCD{
+class LCD {
 	private:
 		uint8_t pagemap[8];
 		
 		uint8_t buff[BUF_SIZE];
-		char[20] surfStr;
-		char[20] subStr;
-		char[20] extStr;
-		char[20] humStr;
-		char[20] winStr;
-		char[20] uvStr;
+		
+		char surfStr[20];
+		char subStr[20];
+		char extStr[20];
+		char humStr[20];
+		char winStr[20];
+		char uvStr[20];
 		
 		// this method draws a single pixel on the LCD
 		void setpixel(uint8_t col, uint8_t row, uint8_t fill);
@@ -141,7 +142,7 @@ class LCD{
 		void lcd_set_brightness(uint8_t val);
 
 		// this method clears the LCD
-		//void clear_screen(void);
+		void clear_screen(void);
 
 		// this method writes the LCD buffer to the LCD
 		void write_buffer();

@@ -27,7 +27,7 @@ i2c::i2c (serial *ptr_serial)
 	// enable i2c protocol
 	TWCR = (1 << TWEN);
 	
-	DBG(this->p_serial, "i2c constructor OK!\r\n");
+	//DBG(this->p_serial, "i2c constructor OK!\r\n");
 }
 
 /*****************************************************************************
@@ -65,7 +65,7 @@ bool i2c::start (void)
 		if (twcnt > TW_TIMEOUT)
 		{
 			// timeout occurred, error
-			DBG(this->p_serial, "i2c::start FAILED - timed out\r\n");
+			//DBG(this->p_serial, "i2c::start FAILED - timed out\r\n");
 			return true;
 		}
 	}
@@ -74,7 +74,7 @@ bool i2c::start (void)
 	if ((TWSR & STAT_MSK) != STAT_START)
 	{
 		// Status register is not a start signal, error
-		DBG(this->p_serial, "i2c::start FAILED - status (0x%2X) bad\r\n", TWSR);
+		//DBG(this->p_serial, "i2c::start FAILED - status (0x%2X) bad\r\n", TWSR);
 		return true;
 	}
 	
@@ -99,7 +99,7 @@ bool i2c::restart (void)
 		if (twcnt > TW_TIMEOUT)
 		{
 			// timeout occurred, error
-			DBG(this->p_serial, "i2c::restart FAILED - timed out\r\n");
+			//DBG(this->p_serial, "i2c::restart FAILED - timed out\r\n");
 			return true;
 		}
 	}
@@ -108,7 +108,7 @@ bool i2c::restart (void)
 	if ((TWSR & STAT_MSK) != STAT_RESTART)
 	{
 		// Status register is not a repeated start signal, error
-		DBG(this->p_serial, "i2c::restart FAILED - status (0x%2X) bad\r\n", TWSR);
+		//DBG(this->p_serial, "i2c::restart FAILED - status (0x%2X) bad\r\n", TWSR);
 		return true;
 	}
 	
@@ -148,7 +148,7 @@ bool i2c::write_byte (uint8_t data)
 		if (twcnt > TW_TIMEOUT)
 		{
 			// timeout occurred, error
-			DBG(this->p_serial, "i2c::write_byte FAILED - timed out\r\n");
+			//DBG(this->p_serial, "i2c::write_byte FAILED - timed out\r\n");
 			return true;
 		}
 	}
@@ -200,7 +200,7 @@ uint8_t i2c::read_byte (bool ack)
 		if (twcnt > TW_TIMEOUT)
 		{
 			// timeout occurred, error
-			DBG(this->p_serial, "i2c::read_byte FAILED - timed out\r\n");
+			//DBG(this->p_serial, "i2c::read_byte FAILED - timed out\r\n");
 			return 0xFF;
 		}
 	}
@@ -224,9 +224,9 @@ bool i2c::write (uint8_t addr, uint8_t reg, uint8_t data)
 	if (!write_byte(addr) || !write_byte(reg) || !write_byte(data))
 	{
 		// an error occurred, one of these had a NACK
-		DBG(this->p_serial,
-			"NACK on write <addr:0x%2X, reg:0x%2X, data:0x%2X>\r\n",
-			addr, reg, data);
+		//DBG(this->p_serial,
+		//	"NACK on write <addr:0x%2X, reg:0x%2X, data:0x%2X>\r\n",
+		//	addr, reg, data);
 		return true;
 	}
 	stop();
@@ -251,8 +251,8 @@ bool i2c::write (uint8_t addr, uint8_t reg, uint8_t* p_buff, uint8_t count)
 	if (!write_byte(addr) || !write_byte(reg))
 	{
 		// an error occurred, one of these had a NACK
-		DBG(this->p_serial, "NACK on write <addr:0x%2X, reg:0x%2X>\r\n",
-			addr, reg);
+		//DBG(this->p_serial, "NACK on write <addr:0x%2X, reg:0x%2X>\r\n",
+		//	addr, reg);
 		return true;
 	}
 	// write the data one byte at a time
@@ -261,7 +261,7 @@ bool i2c::write (uint8_t addr, uint8_t reg, uint8_t* p_buff, uint8_t count)
 		if (!write_byte(*p_buff++))
 		{
 			// a NACK happened too early
-			DBG(this->p_serial, "NACK on write data %u\r\n", ndx);
+			//DBG(this->p_serial, "NACK on write data %u\r\n", ndx);
 			return true;
 		}
 	}
@@ -290,8 +290,8 @@ uint8_t i2c::read (uint8_t addr, uint8_t reg)
 	if (!write_byte(addr) || !write_byte(reg))
 	{
 		// an error occurred, one of these had a NACK
-		DBG(this->p_serial, "Write NACK on read <addr:0x%2X, reg:0x%2X>\r\n",
-			addr, reg);
+		//DBG(this->p_serial, "Write NACK on read <addr:0x%2X, reg:0x%2X>\r\n",
+		//	addr, reg);
 		return 0xFF;
 	}
 	stop();
@@ -300,8 +300,8 @@ uint8_t i2c::read (uint8_t addr, uint8_t reg)
 	if (!write_byte(addr | READ_BIT))
 	{
 		// an error occurred, a NACK was received
-		DBG(this->p_serial, "NACK on read <addr:0x%2X>\r\n",
-			addr | READ_BIT);
+		//DBG(this->p_serial, "NACK on read <addr:0x%2X>\r\n",
+		//	addr | READ_BIT);
 		return 0xFF;
 	}
 	// read byte with a NACK expected
@@ -328,8 +328,8 @@ bool i2c::read (uint8_t addr, uint8_t reg, uint8_t* p_buff, uint8_t count)
 		if (!write_byte(addr) || !write_byte(reg))
 		{
 			// an error occurred, one of these had a NACK
-			DBG(this->p_serial, "Write NACK on read <addr:0x%2X, reg:0x%2X>\r\n",
-				addr, reg);
+			//DBG(this->p_serial, "Write NACK on read <addr:0x%2X, reg:0x%2X>\r\n",
+			//	addr, reg);
 			return true;
 		}
 		stop();
@@ -338,8 +338,8 @@ bool i2c::read (uint8_t addr, uint8_t reg, uint8_t* p_buff, uint8_t count)
 		if (!write_byte(addr | READ_BIT))
 		{
 			// an error occurred, a NACK was received
-			DBG(this->p_serial, "NACK on read <addr:0x%2X>\r\n",
-				addr | READ_BIT);
+			//DBG(this->p_serial, "NACK on read <addr:0x%2X>\r\n",
+			//	addr | READ_BIT);
 			return 0xFF;
 		}
 		

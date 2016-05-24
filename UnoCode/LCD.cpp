@@ -283,20 +283,17 @@ LCD::LCD (void)
 	DDRB |= (1 << MOSI) | (1 << SCK) | (1 << SS);
 	DDRC |= (1 << A0) | (1 << RST);
 
+	//clear_screen();
 	clear_buffer();
 
 	spi_init();
 	setup_lcd();
-
-	EICRA = 0x03;
-	EIMSK = 0x01;
-	EIFR = 0x01;
-
-	sprintf(surfStr, "Surf:%02d.%02d", surf_temp / 100, surf_temp % 100);
-	sprintf(subStr, "Sub:%02d.%02d", sub_temp / 100, sub_temp % 100);
-	sprintf(extStr, "Ext:%02d.%02d", ext_temp / 100, ext_temp % 100);
-	sprintf(humStr, "Hum:%02d.%02d", humidity / 1024, humidity % 1024);
 	
+	sprintf(surfStr, "Surf:%02ld.%02ld", surf_temp / 100, surf_temp % 100);
+	sprintf(subStr, "Sub:%02ld.%02ld", sub_temp / 100, sub_temp % 100);
+	sprintf(extStr, "Ext:%02ld.%02ld", ext_temp / 100, ext_temp % 100);
+	sprintf(humStr, "Hum:%02lu.%02lu", ext_hum / 1024, ext_hum % 1024);
+
 	if(windy)
 	{
 		sprintf(winStr, "W:Y");
@@ -308,21 +305,23 @@ LCD::LCD (void)
 	
 	sprintf(uvStr, "UV:%01d.%02d", uv_ndx / 100, uv_ndx % 100);
 
-	drawstring(0, 0, "Duck Pond");
-	drawstring(0, 1, surfStr);
-	drawstring(0, 2, subStr);
-	drawstring(0, 3, extStr);
-	drawstring(0, 4, humStr);
-	drawstring(11, 1, winStr);
-	drawstring(11, 3, uvStr);
+	drawstring(0, 0, (uint8_t*)"Duck Pond");
+	drawstring(0, 1, (uint8_t*)surfStr);
+	drawstring(0, 2, (uint8_t*)subStr);
+	drawstring(0, 3, (uint8_t*)extStr);
+	drawstring(0, 4, (uint8_t*)humStr);
+	drawstring(11, 1, (uint8_t*)winStr);
+	drawstring(11, 3, (uint8_t*)uvStr);
 
-	drawstring(0, 6, "LN1");
+	drawstring(0, 6, (uint8_t*)"LN1");
 
-	drawrect(17, 48, 60, 7);
+	drawrect(17, 48, 60, 7, 1);
 
-	drawstring(0, 7, "LN2");
+	drawstring(0, 7, (uint8_t*)"LN2");
 
-	drawrect(17, 55, 60, 7);
+	drawrect(17, 55, 60, 7, 1);
+	
+	write_buffer();
 }
 
 /*****************************************************************************
@@ -465,6 +464,22 @@ void LCD::write_buffer()
 		for(data = 0; data < 128; data++) 
 		{
 			lcd_data(buff[(128*page)+data]);
+		}
+	}
+}
+
+void LCD::clear_screen()
+{
+	return;
+	uint8_t page, data;
+	
+	for(page = 0; page < 8; page++) {
+
+		//lcd_command(CMD_SET_PAGE | page);
+		for(data = 0; data < 129; data++) {
+			//lcd_command(CMD_SET_COLUMN_LOWER | (data & 0xf));
+			//lcd_command(CMD_SET_COLUMN_UPPER | ((data >> 4) & 0xf));
+			//lcd_data(0x0);
 		}
 	}
 }
@@ -659,12 +674,14 @@ void LCD::clear_buffer(void) {
 
 void LCD::LCDTask()
 {
-	clear_buffer();
-
-	sprintf(surfStr, "Surf:%02d.%02d", surf_temp / 100, surf_temp % 100);
-	sprintf(subStr, "Sub:%02d.%02d", sub_temp / 100, sub_temp % 100);
-	sprintf(extStr, "Ext:%02d.%02d", ext_temp / 100, ext_temp % 100);
-	sprintf(humStr, "Hum:%02d.%02d", humidity / 1024, humidity % 1024);
+	//clear_buffer();
+	//setpixel(LCDWIDTH / 2, LCDHEIGHT / 2, 1);
+	
+/*
+	sprintf(surfStr, "Surf:%02ld.%02ld", surf_temp / 100, surf_temp % 100);
+	sprintf(subStr, "Sub:%02ld.%02ld", sub_temp / 100, sub_temp % 100);
+	sprintf(extStr, "Ext:%02ld.%02ld", ext_temp / 100, ext_temp % 100);
+	sprintf(humStr, "Hum:%02lu.%02lu", hum / 1024, hum % 1024);
 	
 	if(windy)
 	{
@@ -677,19 +694,22 @@ void LCD::LCDTask()
 	
 	sprintf(uvStr, "UV:%01d.%02d", uv_ndx / 100, uv_ndx % 100);
 
-	drawstring(0, 0, "Duck Pond");
-	drawstring(0, 1, surfStr);
-	drawstring(0, 2, subStr);
-	drawstring(0, 3, extStr);
-	drawstring(0, 4, humStr);
-	drawstring(11, 1, winStr);
-	drawstring(11, 3, uvStr);
+	drawstring(0, 0, (uint8_t*)"Duck Pond");
+	drawstring(0, 1, (uint8_t*)surfStr);
+	drawstring(0, 2, (uint8_t*)subStr);
+	drawstring(0, 3, (uint8_t*)extStr);
+	drawstring(0, 4, (uint8_t*)humStr);
+	drawstring(11, 1, (uint8_t*)winStr);
+	drawstring(11, 3, (uint8_t*)uvStr);
 
-	drawstring(0, 6, "LN1");
+	drawstring(0, 6, (uint8_t*)"LN1");
 
-	drawrect(17, 48, 60, 7);
+	drawrect(17, 48, 60, 7, 1);
 
-	drawstring(0, 7, "LN2");
+	drawstring(0, 7, (uint8_t*)"LN2");
 
-	drawrect(17, 55, 60, 7);
+	drawrect(17, 55, 60, 7, 1);
+	*/
+	
+	//write_buffer();
 }

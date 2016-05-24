@@ -28,7 +28,7 @@ oneWire::oneWire(serial *ptr_serial, uint8_t pin, uint8_t id)
 	// make the data an input
 	INPUT(DATA_DDR, data_line);
 
-	DBG(this->p_serial, "oneWire Constructor ok! Device id: %d\r\n", dev_id);
+	//DBG(this->p_serial, "oneWire Constructor ok! Device id: %d\r\n", dev_id);
 }
 
 /*****************************************************************************
@@ -192,9 +192,9 @@ void oneWire::oneWireTask (void)
 	int16_t temp;
 	int32_t temp_f;
 	
-	if ((runs % 5) == 0)
-	{
-		DBG(this->p_serial, "\r\noneWire Task Running\r\n");
+	//if ((runs % 5) == 0)
+	//{
+		//DBG(this->p_serial, "\r\noneWire Task Running on device: %d\r\n", dev_id);
 		
 		// perform temperature conversion
 		reset();
@@ -213,10 +213,20 @@ void oneWire::oneWireTask (void)
 		temp = convert_temp(temp);
 		temp_f = TEMP_C_TO_F((int32_t)temp);
 		
-		DBG(this->p_serial, "Temp sensor %d: %d.%02dC or %ld.%02ldF\r\n",
-			dev_id, 
-			(temp / 100), (temp % 100),
-			(temp_f / 100), (temp_f % 100));
-	}
+		// update global value
+		if (dev_id == ID_SURFACE_TEMP)
+		{
+			surf_temp = temp_f;
+		}
+		else if (dev_id == ID_UNDERWATER_TEMP)
+		{
+			sub_temp = temp_f;
+		}
+		
+		//DBG(this->p_serial, "Temp sensor %d: %d.%02dC or %ld.%02ldF\r\n",
+		//	dev_id, 
+		//	(temp / 100), (temp % 100),
+		//	(temp_f / 100), (temp_f % 100));
+	//}
 	runs++;
 }

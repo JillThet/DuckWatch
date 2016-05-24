@@ -104,11 +104,15 @@ void UVIndex::UVIndexTask (void)
 {
 	static uint8_t runs  = 0;
 	
+	// update global value
+	uv_ndx = read();
+	
+	/*
 	if ((runs % 5) == 0)
 	{
 		DBG(this->p_serial, "\r\nUVIndex Task Running\r\n")
 		DBG(this->p_serial, "UV Index reading: %d\r\n", read());
 	}
-	
+	*/
 	runs++;
 }

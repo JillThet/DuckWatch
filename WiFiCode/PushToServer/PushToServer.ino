@@ -17,9 +17,9 @@ const char* ssid = "Infected";
 const char* password = "9258302935";
 */
 
-const char* url= "http://jillthetford.com/SeniorProject/";
-const char* dbUpdateURL = "http://jillthetford.com/SeniorProject/databaseUpdate.php";
-const char* lnUpdateURL = "http://jillthetford.com/SeniorProject/laneUpdate.php";
+String url= "http://jillthetford.com/SeniorProject/";
+String dbUpdateURL = "http://jillthetford.com/SeniorProject/databaseUpdate.php";
+String lnUpdateURL = "http://jillthetford.com/SeniorProject/laneUpdate.php";
 
 String surf_temp;
 String sub_temp;
@@ -31,13 +31,21 @@ String ln_1_status;
 String ln_2_status;
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
  
   WiFi.begin(ssid, password);
-  
+
+  Serial.print("Connecting to ");
+  Serial.print(ssid);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
+    Serial.print(".");
   }
+
+  Serial.println("");
+  Serial.println("WiFi connected");
+  Serial.println("IP address: ");
+  Serial.println(WiFi.localIP());
 }
 
 /*
@@ -45,6 +53,10 @@ void setup() {
  */
 void push_to_server(String url)
 {  
+  Serial.println();
+  Serial.print("pushing url [");
+  Serial.print(url);
+  Serial.println("] to server...");
   // Create HTTP Client
   HTTPClient http;
   // setup connection
@@ -66,6 +78,8 @@ bool read_pkt(String pkt) {
   int ndx_start = 0;
   int ndx_comma;
   int loop_cnt = 0;
+
+  pkt.trim();
   
   // check for correct packet header and trailer
   if (pkt.startsWith("<[=") && pkt.endsWith("=]>"))
@@ -135,15 +149,18 @@ bool read_pkt(String pkt) {
 void build_and_send()
 {
   // update the pond
-  push_to_server(dbUpdateURL + "?pool=1&surf=" + surf_temp +
+  String pond_url = dbUpdateURL + "?pool=1&surf=" + surf_temp +
     "&sub=" + sub_temp + "&ext=" + ext_temp + "&hum=" + humidity +
-    "&hum=" + humidity + "&wind=" + windy + "&uv=" + uv_ndx);
+    "&hum=" + humidity + "&wind=" + windy + "&uv=" + uv_ndx;
+  push_to_server(pond_url);
 
   // update lillypad (lane) 1
-  push_to_server(lnUpdateURL + "?pool=1&lane=1&stat=" + ln_1_status);
-
+  String lillypad_1_url = lnUpdateURL + "?pool=1&lane=1&stat=" + ln_1_status;
+  push_to_server(lillypad_1_url);
+  
   // update lillypad (lane) 2
-  push_to_server(lnUpdateURL + "?pool=1&lane=2&stat=" + ln_2_status);
+  String lillypad_2_url = lnUpdateURL + "?pool=1&lane=2&stat=" + ln_2_status;
+  push_to_server(lillypad_2_url);
 }
 
 void loop() {
@@ -157,6 +174,23 @@ void loop() {
     // read packet and check if formatted correctly
     if (read_pkt(Serial.readString()))
     {
+      Serial.println("Packet Contents:");
+      Serial.print("surf_temp: ");
+      Serial.println(surf_temp);
+      Serial.print("sub_temp: ");
+      Serial.println(sub_temp);
+      Serial.print("ext_temp: ");
+      Serial.println(ext_temp);
+      Serial.print("humidity: ");
+      Serial.println(humidity);
+      Serial.print("windy: ");
+      Serial.println(windy);
+      Serial.print("uv_ndx: ");
+      Serial.println(uv_ndx);
+      Serial.print("ln_1_status: ");
+      Serial.println(ln_1_status);
+      Serial.print("ln_2_status: ");
+      Serial.println(ln_2_status);
       // build URLs and send to server
       build_and_send(); 
     }
